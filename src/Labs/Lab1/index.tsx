@@ -199,7 +199,7 @@ export default function Lab1() {
             title="The last name"
             id="wd-text-fields-last-name"
           />
-          <textarea cols="20" rows="25" placeholder="Biography" title="tooltip">
+          <textarea cols={20} rows={25} placeholder="Biography" title="tooltip">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed aliquet
             accumsan lectus nec posuere. Ut consequat venenatis mollis. Nullam
             consectetur risus eros, in sagittis tellus placerat sit amet. Nunc

@@ -76,9 +76,9 @@ export default function AssignmentEditor() {
       </table>
       <hr></hr>
 
-      <div align="right">
-        <button id="wd-cancel-button">Cancel</button>
+      <div dir="rtl">
         <button id="wd-save-button">Save</button>
+        <button id="wd-cancel-button">Cancel</button>
       </div>
     </div>
   );
