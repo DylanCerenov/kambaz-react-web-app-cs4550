@@ -324,20 +324,20 @@ export default function Lab1() {
         <option value="FANTASY"> Fantasy </option>
       </select>
       <h4>Anchor tag</h4>
-      Please
+      {"Please "}
       <a href="https://www.lipsum.com" id="wd-lipsum">
         click here
       </a>
-      to get dummy text
+      {" to get dummy text"}
       <br />
-      Please
+      {"Please "}
       <a
         href="https://github.com/DylanCerenov/kambaz-react-web-app-cs4550"
         id="wd-github"
       >
         click here
       </a>
-      to go to the code repository on GitHub
+      {" to go to the code repository on GitHub"}
       <br />
       {/* 1.2.9 */}
     </div>
