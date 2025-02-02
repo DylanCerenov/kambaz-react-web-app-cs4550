@@ -3,6 +3,7 @@ import { AiOutlineDashboard } from "react-icons/ai";
 import { IoCalendarOutline } from "react-icons/io5";
 import { LiaBookSolid, LiaCogSolid } from "react-icons/lia";
 import { FaInbox, FaRegCircleUser } from "react-icons/fa6";
+import "./styles.css";
 
 export default function KambazNavigation() {
   const location = useLocation();
@@ -10,7 +11,7 @@ export default function KambazNavigation() {
   return (
     <div
       id="wd-kambaz-navigation"
-      style={{ width: 120 }}
+      style={{ width: 110 }}
       className="list-group rounded-0 position-fixed bottom-0 top-0 d-none d-md-block bg-black z-2"
     >
       <a
@@ -57,10 +58,13 @@ export default function KambazNavigation() {
       </Link>
 
       <Link
-        to="/Kambaz/Dashboard"
+        to="/Kambaz/Courses/1234/Home"
         id="wd-course-link"
-        className="list-group-item text-white
-                  bg-black text-center border-0"
+        className={`list-group-item text-center border-0 ${
+          location.pathname.includes("/Kambaz/Courses")
+            ? "bg-white text-danger"
+            : "bg-black text-white"
+        }`}
       >
         <LiaBookSolid className="fs-1 text-danger" />
         <br />
@@ -70,8 +74,11 @@ export default function KambazNavigation() {
       <Link
         to="/Kambaz/Calendar"
         id="wd-calendar-link"
-        className="list-group-item text-white
-                  bg-black text-center border-0"
+        className={`list-group-item text-center border-0 ${
+          location.pathname.includes("/Kambaz/Calendar")
+            ? "bg-white text-danger"
+            : "bg-black text-white"
+        }`}
       >
         <IoCalendarOutline className="fs-1 text-danger" />
         <br />
@@ -81,8 +88,11 @@ export default function KambazNavigation() {
       <Link
         to="/Kambaz/Inbox"
         id="wd-inbox-link"
-        className="list-group-item text-white
-                  bg-black text-center border-0"
+        className={`list-group-item text-center border-0 ${
+          location.pathname.includes("/Kambaz/Inbox")
+            ? "bg-white text-danger"
+            : "bg-black text-white"
+        }`}
       >
         <FaInbox className="fs-1 text-danger" />
         <br />
