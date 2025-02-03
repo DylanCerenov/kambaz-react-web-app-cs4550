@@ -13,13 +13,18 @@ export default function TOC() {
         <Nav.Link href="#/Labs/Lab2">Lab 2</Nav.Link>
       </Nav.Item>
       <Nav.Item>
-        <Nav.Link href="#/Labs/Lab2">Lab 3</Nav.Link>
+        <Nav.Link href="#/Labs/Lab3">Lab 3</Nav.Link>
       </Nav.Item>
       <Nav.Item>
         <Nav.Link href="#/Kambaz/Dashboard">Kambaz</Nav.Link>
       </Nav.Item>
       <Nav.Item>
-        <Nav.Link href="https://github.com/dylancerenov">My GitHub</Nav.Link>
+        <Nav.Link
+          id="wd-github"
+          href="https://github.com/DylanCerenov/kambaz-react-web-app-cs4550"
+        >
+          My GitHub
+        </Nav.Link>
       </Nav.Item>
     </Nav>
   );
