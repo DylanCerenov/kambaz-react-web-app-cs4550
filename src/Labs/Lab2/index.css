@@ -97,6 +97,13 @@ p#wd-id-selector-2 {
  border-radius: 50px;
 }
 
+.wd-rounded-corners-all-around-alternate {
+  border-radius: 10px;
+  border-color: lightgray;
+  border-width: 1px;
+  padding: 15px;
+ }
+
 .wd-rounded-corners-inline {
  border-radius: 30px 0px 20px 50px;
 }
