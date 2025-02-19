@@ -6,8 +6,38 @@ import LessonControlButtons from "../Modules/LessonControlButtons";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { TfiWrite } from "react-icons/tfi";
 import { Link } from "react-router-dom";
+import { useParams } from "react-router";
+import * as db from "../../Database";
+
+function formatDate(date: {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+}) {
+  const { year, month, day, hour, minute } = date;
+
+  const dateObj = new Date(year, month - 1, day, hour, minute);
+  const datePart = dateObj.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+  });
+  ``;
+  const timePart = dateObj
+    .toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    })
+    .toLowerCase();
+  return `${datePart} at ${timePart}`;
+}
 
 export default function Assignments() {
+  const { cid } = useParams();
+  const assignments = db.assignments;
+
   return (
     <div id="wd-assignments">
       <div className="d-flex align-items-center w-100">
@@ -71,59 +101,33 @@ export default function Assignments() {
             </div>
           </div>
           <ListGroup className="wd-lessons rounded-0">
-            <Link key={"123"} to={"123"} className="text-decoration-none">
-              <ListGroup.Item className="wd-lesson p-3 ps-1 d-flex align-items-center">
-                <BsGripVertical className="me-2 fs-3" />
-                <TfiWrite className="icon-padding me-2" />
-                <div className="flex-grow-1" style={{ padding: "8px" }}>
-                  <b>A1</b>
-                  <div>
-                    <div style={{ color: "red", display: "inline" }}>
-                      Multiple Modules
-                    </div>{" "}
-                    | <b>Not available until</b> May 6 at 12:00am | <b>Due</b>{" "}
-                    May 13 at 11:59pm | 100 pts
-                  </div>
-                </div>
-                <LessonControlButtons />
-              </ListGroup.Item>
-            </Link>
-
-            <Link key={"124"} to={"124"} className="text-decoration-none">
-              <ListGroup.Item className="wd-lesson p-3 ps-1 d-flex align-items-center">
-                <BsGripVertical className="me-2 fs-3" />
-                <TfiWrite className="icon-padding me-2" />
-                <div className="flex-grow-1" style={{ padding: "8px" }}>
-                  <b>A2</b>
-                  <div>
-                    <div style={{ color: "red", display: "inline" }}>
-                      Multiple Modules
-                    </div>{" "}
-                    | <b>Not available until</b> May 13 at 12:00am | <b>Due</b>{" "}
-                    May 20 at 11:59pm | 100 pts
-                  </div>
-                </div>
-                <LessonControlButtons />
-              </ListGroup.Item>
-            </Link>
-
-            <Link key={"125"} to={"125"} className="text-decoration-none">
-              <ListGroup.Item className="wd-lesson p-3 ps-1 d-flex align-items-center">
-                <BsGripVertical className="me-2 fs-3" />
-                <TfiWrite className="icon-padding me-2" />
-                <div className="flex-grow-1" style={{ padding: "8px" }}>
-                  <b>A3</b>
-                  <div>
-                    <div style={{ color: "red", display: "inline" }}>
-                      Multiple Modules
-                    </div>{" "}
-                    | <b>Not available until</b> May 20 at 12:00am | <b>Due</b>{" "}
-                    May 27 at 11:59pm | 100 pts
-                  </div>
-                </div>
-                <LessonControlButtons />
-              </ListGroup.Item>
-            </Link>
+            {assignments
+              .filter((assignment: any) => assignment.course === cid)
+              .map((assignment: any) => (
+                <Link
+                  key={assignment._id}
+                  to={assignment._id}
+                  className="text-decoration-none"
+                >
+                  <ListGroup.Item className="wd-lesson p-3 ps-1 d-flex align-items-center">
+                    <BsGripVertical className="me-2 fs-3" />
+                    <TfiWrite className="icon-padding me-2" />
+                    <div className="flex-grow-1" style={{ padding: "8px" }}>
+                      <b>{assignment.title}</b>
+                      <div>
+                        <div style={{ color: "red", display: "inline" }}>
+                          Multiple Modules
+                        </div>{" "}
+                        | <b>Not available until</b>{" "}
+                        {formatDate(assignment.availableDate)} | <b>Due</b>{" "}
+                        {formatDate(assignment.dueDate)} | {assignment.points}{" "}
+                        pts
+                      </div>
+                    </div>
+                    <LessonControlButtons />
+                  </ListGroup.Item>
+                </Link>
+              ))}
           </ListGroup>
         </ListGroup.Item>
       </ListGroup>

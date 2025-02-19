@@ -8,16 +8,36 @@ import {
   FormSelect,
   Button,
 } from "react-bootstrap";
+import { Link, useParams } from "react-router";
+import * as db from "../../Database";
+
+function formatDate(year: number, month: number, day: number) {
+  const monthStr = String(month).padStart(2, "0");
+  const dayStr = String(day).padStart(2, "0");
+  return `${year}-${monthStr}-${dayStr}`;
+}
 
 export default function AssignmentEditor() {
+  const { cid, aid } = useParams();
+  const assignments = db.assignments;
+  const assignment = assignments.find((a) => a._id === aid);
+
   return (
     <div id="wd-assignments-editor" className="w-50">
       <FormGroup className="mb-3" controlId="wd-assignment-name">
         <FormLabel>Assignment Name</FormLabel>
-        <FormControl placeholder="A1" />
+        <FormControl
+          placeholder="Title..."
+          defaultValue={assignment ? assignment.title : ""}
+        />
       </FormGroup>
       <FormGroup className="mb-3" controlId="wd-textarea">
-        <FormControl as="textarea" rows={3} placeholder="nice nice nice" />
+        <FormControl
+          as="textarea"
+          rows={3}
+          placeholder="Description..."
+          defaultValue={assignment ? assignment.desc : ""}
+        />
       </FormGroup>
 
       <Form.Group as={Row} className="mb-3" controlId="points">
@@ -25,7 +45,10 @@ export default function AssignmentEditor() {
           Points
         </Form.Label>
         <Col sm={10}>
-          <Form.Control type="number" value="100" />
+          <Form.Control
+            type="number"
+            defaultValue={assignment ? assignment.points : "100"}
+          />
         </Col>
       </Form.Group>
       <Form.Group as={Row} className="mb-3" controlId="assignment-group">
@@ -94,7 +117,18 @@ export default function AssignmentEditor() {
             <b>Due</b>
           </Form.Label>
           <Col sm={10}>
-            <Form.Control type="date" value="May 13, 2024, 11:59 PM" />
+            <Form.Control
+              type="date"
+              defaultValue={
+                assignment
+                  ? formatDate(
+                      assignment.dueDate.year,
+                      assignment.dueDate.month,
+                      assignment.dueDate.day
+                    )
+                  : "2024-05-13"
+              }
+            />
           </Col>
 
           <div className="wd-flex-row-container">
@@ -103,7 +137,18 @@ export default function AssignmentEditor() {
                 <b>Available from</b>
               </Form.Label>
               <Col sm={10}>
-                <Form.Control type="date" value="May 6, 2024, 12:00 AM" />
+                <Form.Control
+                  type="date"
+                  defaultValue={
+                    assignment
+                      ? formatDate(
+                          assignment.availableDate.year,
+                          assignment.availableDate.month,
+                          assignment.availableDate.day
+                        )
+                      : "2024-05-06"
+                  }
+                />
               </Col>
             </div>
             <div>
@@ -111,7 +156,18 @@ export default function AssignmentEditor() {
                 <b>Until</b>
               </Form.Label>
               <Col sm={10}>
-                <Form.Control type="date" value="" />
+                <Form.Control
+                  type="date"
+                  defaultValue={
+                    assignment
+                      ? formatDate(
+                          assignment.dueDate.year,
+                          assignment.dueDate.month,
+                          assignment.dueDate.day
+                        )
+                      : "2024-05-13"
+                  }
+                />
               </Col>
             </div>
           </div>
@@ -120,22 +176,28 @@ export default function AssignmentEditor() {
 
       <div dir="rtl">
         <div className="wd-flex-row-container">
-          <Button
-            variant="danger"
-            size="lg"
-            className="me-1 float-end"
-            id="wd-add-module-btn"
+          <Link
+            to={`/Kambaz/Courses/${cid}/Assignments`}
+            className="wd-dashboard-course-link text-decoration-none text-dark"
           >
-            Save
-          </Button>
-          <Button
-            variant="secondary"
-            size="lg"
-            className="me-1 float-end"
-            id="wd-add-module-btn"
-          >
-            Cancel
-          </Button>
+            <Button
+              variant="danger"
+              size="lg"
+              className="me-1 float-end"
+              id="wd-add-module-btn"
+            >
+              Save
+            </Button>
+
+            <Button
+              variant="secondary"
+              size="lg"
+              className="me-1 float-end"
+              id="wd-add-module-btn"
+            >
+              Cancel
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
