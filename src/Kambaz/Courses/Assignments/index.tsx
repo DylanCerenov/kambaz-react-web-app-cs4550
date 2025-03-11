@@ -8,6 +8,7 @@ import { TfiWrite } from "react-icons/tfi";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router";
 import * as db from "../../Database";
+import { useSelector } from "react-redux";
 
 function formatDate(date: {
   year: number;
@@ -37,6 +38,8 @@ function formatDate(date: {
 export default function Assignments() {
   const { cid } = useParams();
   const assignments = db.assignments;
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const isFaculty = currentUser.role === "FACULTY";
 
   return (
     <div id="wd-assignments">
@@ -53,31 +56,35 @@ export default function Assignments() {
           />
         </div>
 
-        <Button
-          variant="secondary"
-          size="lg"
-          className="me-1 ms-auto"
-          id="wd-add-assignment-group"
-        >
-          <FaPlus
-            className="position-relative me-2"
-            style={{ bottom: "1px" }}
-          />
-          Group
-        </Button>
+        {isFaculty && (
+          <Button
+            variant="secondary"
+            size="lg"
+            className="me-1 ms-auto"
+            id="wd-add-assignment-group"
+          >
+            <FaPlus
+              className="position-relative me-2"
+              style={{ bottom: "1px" }}
+            />
+            Group
+          </Button>
+        )}
 
-        <Button
-          variant="danger"
-          size="lg"
-          className="me-1 float-end"
-          id="wd-add-assignment"
-        >
-          <FaPlus
-            className="position-relative me-2"
-            style={{ bottom: "1px" }}
-          />
-          Assignment
-        </Button>
+        {isFaculty && (
+          <Button
+            variant="danger"
+            size="lg"
+            className="me-1 float-end"
+            id="wd-add-assignment"
+          >
+            <FaPlus
+              className="position-relative me-2"
+              style={{ bottom: "1px" }}
+            />
+            Assignment
+          </Button>
+        )}
       </div>
       <br />
       <br />
