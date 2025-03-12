@@ -8,6 +8,7 @@ import { useState } from "react";
 import ProtectedRoute from "./Account/ProtectedRoute";
 import { useDispatch, useSelector } from "react-redux";
 import { addCourse, deleteCourse, updateCourse } from "./Courses/reducer";
+import ProtectedCourseRoute from "./Courses/ProtectedCourseRoute";
 
 export default function Kambaz() {
   const { courses } = useSelector((state: any) => state.coursesReducer);
@@ -75,9 +76,9 @@ export default function Kambaz() {
           <Route
             path="/Courses/:cid/*"
             element={
-              <ProtectedRoute>
+              <ProtectedCourseRoute>
                 <Courses courses={courses} />
-              </ProtectedRoute>
+              </ProtectedCourseRoute>
             }
           />
           <Route path="/Calendar" element={<h1>Calendar</h1>} />
