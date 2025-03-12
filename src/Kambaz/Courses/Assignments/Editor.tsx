@@ -9,7 +9,9 @@ import {
   Button,
 } from "react-bootstrap";
 import { Link, useParams } from "react-router";
-import * as db from "../../Database";
+import { addAssignment, updateAssignment } from "./reducer";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 function formatDate(year: number, month: number, day: number) {
   const monthStr = String(month).padStart(2, "0");
@@ -17,10 +19,54 @@ function formatDate(year: number, month: number, day: number) {
   return `${year}-${monthStr}-${dayStr}`;
 }
 
+function stringDateToObject(inputDate: string) {
+  const [year, month, day] = inputDate.split("-").map(Number);
+
+  return {
+    year: year,
+    month: month,
+    day: day,
+    hour: 0,
+    minute: 0,
+  };
+}
+
 export default function AssignmentEditor() {
   const { cid, aid } = useParams();
-  const assignments = db.assignments;
-  const assignment = assignments.find((a) => a._id === aid);
+  const { assignments } = useSelector((state: any) => state.assignmentsReducer);
+  const assignment = assignments.find((a: { _id: string }) => a._id === aid);
+  const dispatch = useDispatch();
+
+  const [title, setTitle] = useState(assignment ? assignment.title : "");
+  const [desc, setDesc] = useState(assignment ? assignment.desc : "");
+  const [points, setPoints] = useState(assignment ? assignment.points : 100);
+  const [dueDate, setDueDate] = useState(
+    assignment
+      ? formatDate(
+          assignment.dueDate.year,
+          assignment.dueDate.month,
+          assignment.dueDate.day
+        )
+      : "2024-05-13"
+  );
+  const [availableDate, setAvailableDate] = useState(
+    assignment
+      ? formatDate(
+          assignment.availableDate.year,
+          assignment.availableDate.month,
+          assignment.availableDate.day
+        )
+      : "2024-05-06"
+  );
+  const [untilDate, setUntilDate] = useState(
+    assignment
+      ? formatDate(
+          assignment.dueDate.year,
+          assignment.dueDate.month,
+          assignment.dueDate.day
+        )
+      : "2024-05-13"
+  );
 
   return (
     <div id="wd-assignments-editor" className="w-50">
@@ -28,15 +74,18 @@ export default function AssignmentEditor() {
         <FormLabel>Assignment Name</FormLabel>
         <FormControl
           placeholder="Title..."
-          defaultValue={assignment ? assignment.title : ""}
+          defaultValue={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
       </FormGroup>
+
       <FormGroup className="mb-3" controlId="wd-textarea">
         <FormControl
           as="textarea"
           rows={3}
           placeholder="Description..."
-          defaultValue={assignment ? assignment.desc : ""}
+          defaultValue={desc}
+          onChange={(e) => setDesc(e.target.value)}
         />
       </FormGroup>
 
@@ -47,10 +96,12 @@ export default function AssignmentEditor() {
         <Col sm={10}>
           <Form.Control
             type="number"
-            defaultValue={assignment ? assignment.points : "100"}
+            defaultValue={points}
+            onChange={(e) => setPoints(Number(e.target.value))}
           />
         </Col>
       </Form.Group>
+
       <Form.Group as={Row} className="mb-3" controlId="assignment-group">
         <Form.Label column sm={2} style={{ textAlign: "right" }}>
           Assignment Group
@@ -61,6 +112,7 @@ export default function AssignmentEditor() {
           </FormSelect>
         </Col>
       </Form.Group>
+
       <Form.Group as={Row} className="mb-3" controlId="display-grade-as">
         <Form.Label column sm={2} style={{ textAlign: "right" }}>
           Display Grade as
@@ -119,15 +171,8 @@ export default function AssignmentEditor() {
           <Col sm={10}>
             <Form.Control
               type="date"
-              defaultValue={
-                assignment
-                  ? formatDate(
-                      assignment.dueDate.year,
-                      assignment.dueDate.month,
-                      assignment.dueDate.day
-                    )
-                  : "2024-05-13"
-              }
+              defaultValue={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
             />
           </Col>
 
@@ -139,18 +184,12 @@ export default function AssignmentEditor() {
               <Col sm={10}>
                 <Form.Control
                   type="date"
-                  defaultValue={
-                    assignment
-                      ? formatDate(
-                          assignment.availableDate.year,
-                          assignment.availableDate.month,
-                          assignment.availableDate.day
-                        )
-                      : "2024-05-06"
-                  }
+                  defaultValue={availableDate}
+                  onChange={(e) => setAvailableDate(e.target.value)}
                 />
               </Col>
             </div>
+
             <div>
               <Form.Label column sm={2}>
                 <b>Until</b>
@@ -158,15 +197,8 @@ export default function AssignmentEditor() {
               <Col sm={10}>
                 <Form.Control
                   type="date"
-                  defaultValue={
-                    assignment
-                      ? formatDate(
-                          assignment.dueDate.year,
-                          assignment.dueDate.month,
-                          assignment.dueDate.day
-                        )
-                      : "2024-05-13"
-                  }
+                  defaultValue={untilDate}
+                  onChange={(e) => setUntilDate(e.target.value)}
                 />
               </Col>
             </div>
@@ -185,6 +217,32 @@ export default function AssignmentEditor() {
               size="lg"
               className="me-1 float-end"
               id="wd-add-module-btn"
+              onClick={() => {
+                if (aid === "New") {
+                  dispatch(
+                    addAssignment({
+                      title: title,
+                      course: cid,
+                      desc: desc,
+                      points: points,
+                      availableDate: stringDateToObject(availableDate),
+                      dueDate: stringDateToObject(dueDate),
+                    })
+                  );
+                } else {
+                  dispatch(
+                    updateAssignment({
+                      _id: aid,
+                      title: title,
+                      course: cid,
+                      desc: desc,
+                      points: points,
+                      availableDate: stringDateToObject(availableDate),
+                      dueDate: stringDateToObject(dueDate),
+                    })
+                  );
+                }
+              }}
             >
               Save
             </Button>

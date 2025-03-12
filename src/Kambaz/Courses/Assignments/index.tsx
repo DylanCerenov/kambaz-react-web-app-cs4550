@@ -1,14 +1,16 @@
 import { Button, ListGroup } from "react-bootstrap";
 import { BsGripVertical } from "react-icons/bs";
 import { FaSearch } from "react-icons/fa";
-import { FaCaretDown, FaPlus } from "react-icons/fa6";
+import { FaCaretDown, FaPlus, FaTrash } from "react-icons/fa6";
 import LessonControlButtons from "../Modules/LessonControlButtons";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { TfiWrite } from "react-icons/tfi";
 import { Link } from "react-router-dom";
-import { useParams } from "react-router";
-import * as db from "../../Database";
-import { useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import { deleteAssignment } from "./reducer";
+import DeleteModal from "./DeleteModal";
 
 function formatDate(date: {
   year: number;
@@ -37,9 +39,16 @@ function formatDate(date: {
 
 export default function Assignments() {
   const { cid } = useParams();
-  const assignments = db.assignments;
+  const { assignments } = useSelector((state: any) => state.assignmentsReducer);
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const isFaculty = currentUser.role === "FACULTY";
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+  const [aid, setAid] = useState("");
 
   return (
     <div id="wd-assignments">
@@ -77,6 +86,9 @@ export default function Assignments() {
             size="lg"
             className="me-1 float-end"
             id="wd-add-assignment"
+            onClick={() => {
+              navigate("/Kambaz/Courses/" + cid + "/Assignments/New");
+            }}
           >
             <FaPlus
               className="position-relative me-2"
@@ -131,6 +143,17 @@ export default function Assignments() {
                         pts
                       </div>
                     </div>
+
+                    <FaTrash
+                      className="text-danger me-2 mb-1"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setAid(assignment._id);
+                        handleShow();
+                      }}
+                    />
+
                     <LessonControlButtons />
                   </ListGroup.Item>
                 </Link>
@@ -138,6 +161,15 @@ export default function Assignments() {
           </ListGroup>
         </ListGroup.Item>
       </ListGroup>
+
+      <DeleteModal
+        show={show}
+        handleClose={handleClose}
+        deleteAssignment={(assignmentId) =>
+          dispatch(deleteAssignment(assignmentId))
+        }
+        aid={aid}
+      />
     </div>
   );
 }
