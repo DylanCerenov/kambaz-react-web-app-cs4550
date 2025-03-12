@@ -4,13 +4,15 @@ import Dashboard from "./Dashboard";
 import KambazNavigation from "./Navigation";
 import Courses from "./Courses";
 import "./styles.css";
-import * as db from "./Database";
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import ProtectedRoute from "./Account/ProtectedRoute";
+import { useDispatch, useSelector } from "react-redux";
+import { addCourse, deleteCourse, updateCourse } from "./Courses/reducer";
 
 export default function Kambaz() {
-  const [courses, setCourses] = useState<any[]>(db.courses);
+  const { courses } = useSelector((state: any) => state.coursesReducer);
+  const dispatch = useDispatch();
+
   const [course, setCourse] = useState<any>({
     _id: "1234",
     name: "New Course",
@@ -19,23 +21,6 @@ export default function Kambaz() {
     endDate: "2023-12-15",
     description: "New Description",
   });
-  const addNewCourse = () => {
-    setCourses([...courses, { ...course, _id: uuidv4() }]);
-  };
-  const deleteCourse = (courseId: any) => {
-    setCourses(courses.filter((course) => course._id !== courseId));
-  };
-  const updateCourse = () => {
-    setCourses(
-      courses.map((c) => {
-        if (c._id === course._id) {
-          return course;
-        } else {
-          return c;
-        }
-      })
-    );
-  };
 
   return (
     <div id="wd-kambaz">
@@ -53,9 +38,36 @@ export default function Kambaz() {
                   courses={courses}
                   course={course}
                   setCourse={setCourse}
-                  addNewCourse={addNewCourse}
-                  deleteCourse={deleteCourse}
-                  updateCourse={updateCourse}
+                  addNewCourse={() => {
+                    dispatch(
+                      addCourse({
+                        name: course.name,
+                        number: course.number,
+                        startDate: course.startDate,
+                        endDate: course.endDate,
+                        department: course.department,
+                        credits: course.credits,
+                        description: course.description,
+                      })
+                    );
+                  }}
+                  deleteCourse={() => {
+                    dispatch(deleteCourse(course._id));
+                  }}
+                  updateCourse={() => {
+                    dispatch(
+                      updateCourse({
+                        _id: course._id,
+                        name: course.name,
+                        number: course.number,
+                        startDate: course.startDate,
+                        endDate: course.endDate,
+                        department: course.department,
+                        credits: course.credits,
+                        description: course.description,
+                      })
+                    );
+                  }}
                 />
               </ProtectedRoute>
             }
