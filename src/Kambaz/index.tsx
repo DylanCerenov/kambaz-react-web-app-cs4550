@@ -4,15 +4,32 @@ import Dashboard from "./Dashboard";
 import KambazNavigation from "./Navigation";
 import Courses from "./Courses";
 import "./styles.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProtectedRoute from "./Account/ProtectedRoute";
 import { useDispatch, useSelector } from "react-redux";
 import { addCourse, deleteCourse, updateCourse } from "./Courses/reducer";
 import ProtectedCourseRoute from "./Courses/ProtectedCourseRoute";
 import Session from "./Account/Session";
+import * as userClient from "./Account/client";
+import * as courseClient from "./Courses/client";
+import { v4 as uuidv4 } from "uuid";
+import { addEnrollment } from "./Dashboard/reducer";
 
 export default function Kambaz() {
-  const { courses } = useSelector((state: any) => state.coursesReducer);
+  const [courses, setCourses] = useState<any[]>([]);
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const fetchCourses = async () => {
+    try {
+      const courses = await userClient.findMyCourses();
+      setCourses(courses);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  useEffect(() => {
+    fetchCourses();
+  }, [currentUser]);
+
   const dispatch = useDispatch();
 
   const [course, setCourse] = useState<any>({
@@ -23,6 +40,30 @@ export default function Kambaz() {
     endDate: "2023-12-15",
     description: "New Description",
   });
+
+  const addNewCourse = async () => {
+    setCourse({ ...course, _id: uuidv4() }); // Generate a new ID
+    const newCourse = await userClient.createCourse(course);
+    setCourses([...courses, newCourse]);
+  };
+
+  const deleteCourse = async (courseId: string) => {
+    const status = await courseClient.deleteCourse(courseId);
+    setCourses(courses.filter((course) => course._id !== courseId));
+  };
+
+  const updateCourse = async () => {
+    await courseClient.updateCourse(course);
+    setCourses(
+      courses.map((c) => {
+        if (c._id === course._id) {
+          return course;
+        } else {
+          return c;
+        }
+      })
+    );
+  };
 
   return (
     <Session>
@@ -41,36 +82,13 @@ export default function Kambaz() {
                     courses={courses}
                     course={course}
                     setCourse={setCourse}
-                    addNewCourse={() => {
-                      dispatch(
-                        addCourse({
-                          name: course.name,
-                          number: course.number,
-                          startDate: course.startDate,
-                          endDate: course.endDate,
-                          department: course.department,
-                          credits: course.credits,
-                          description: course.description,
-                        })
-                      );
+                    addNewCourse={() => addNewCourse()}
+                    deleteCourse={(courseId) => {
+                      console.log(course._id);
+                      deleteCourse(courseId);
+                      console.log(courses);
                     }}
-                    deleteCourse={() => {
-                      dispatch(deleteCourse(course._id));
-                    }}
-                    updateCourse={() => {
-                      dispatch(
-                        updateCourse({
-                          _id: course._id,
-                          name: course.name,
-                          number: course.number,
-                          startDate: course.startDate,
-                          endDate: course.endDate,
-                          department: course.department,
-                          credits: course.credits,
-                          description: course.description,
-                        })
-                      );
-                    }}
+                    updateCourse={() => updateCourse()}
                   />
                 </ProtectedRoute>
               }

@@ -16,7 +16,7 @@ export default function Dashboard({
   course: any;
   setCourse: (course: any) => void;
   addNewCourse: () => void;
-  deleteCourse: (course: any) => void;
+  deleteCourse: (courseId: any) => void;
   updateCourse: () => void;
 }) {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
