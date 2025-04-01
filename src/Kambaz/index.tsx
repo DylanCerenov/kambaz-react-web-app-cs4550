@@ -9,6 +9,7 @@ import ProtectedRoute from "./Account/ProtectedRoute";
 import { useDispatch, useSelector } from "react-redux";
 import { addCourse, deleteCourse, updateCourse } from "./Courses/reducer";
 import ProtectedCourseRoute from "./Courses/ProtectedCourseRoute";
+import Session from "./Account/Session";
 
 export default function Kambaz() {
   const { courses } = useSelector((state: any) => state.coursesReducer);
@@ -24,67 +25,69 @@ export default function Kambaz() {
   });
 
   return (
-    <div id="wd-kambaz">
-      <KambazNavigation />
+    <Session>
+      <div id="wd-kambaz">
+        <KambazNavigation />
 
-      <div className="wd-main-content-offset p-3">
-        <Routes>
-          <Route path="/" element={<Navigate to="/Kambaz/Account" />} />
-          <Route path="/Account/*" element={<Account />} />
-          <Route
-            path="/Dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard
-                  courses={courses}
-                  course={course}
-                  setCourse={setCourse}
-                  addNewCourse={() => {
-                    dispatch(
-                      addCourse({
-                        name: course.name,
-                        number: course.number,
-                        startDate: course.startDate,
-                        endDate: course.endDate,
-                        department: course.department,
-                        credits: course.credits,
-                        description: course.description,
-                      })
-                    );
-                  }}
-                  deleteCourse={() => {
-                    dispatch(deleteCourse(course._id));
-                  }}
-                  updateCourse={() => {
-                    dispatch(
-                      updateCourse({
-                        _id: course._id,
-                        name: course.name,
-                        number: course.number,
-                        startDate: course.startDate,
-                        endDate: course.endDate,
-                        department: course.department,
-                        credits: course.credits,
-                        description: course.description,
-                      })
-                    );
-                  }}
-                />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/Courses/:cid/*"
-            element={
-              <ProtectedCourseRoute>
-                <Courses courses={courses} />
-              </ProtectedCourseRoute>
-            }
-          />
-          <Route path="/Calendar" element={<h1>Calendar</h1>} />
-          <Route path="/Inbox" element={<h1>Inbox</h1>} />
-        </Routes>
+        <div className="wd-main-content-offset p-3">
+          <Routes>
+            <Route path="/" element={<Navigate to="/Kambaz/Account" />} />
+            <Route path="/Account/*" element={<Account />} />
+            <Route
+              path="/Dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard
+                    courses={courses}
+                    course={course}
+                    setCourse={setCourse}
+                    addNewCourse={() => {
+                      dispatch(
+                        addCourse({
+                          name: course.name,
+                          number: course.number,
+                          startDate: course.startDate,
+                          endDate: course.endDate,
+                          department: course.department,
+                          credits: course.credits,
+                          description: course.description,
+                        })
+                      );
+                    }}
+                    deleteCourse={() => {
+                      dispatch(deleteCourse(course._id));
+                    }}
+                    updateCourse={() => {
+                      dispatch(
+                        updateCourse({
+                          _id: course._id,
+                          name: course.name,
+                          number: course.number,
+                          startDate: course.startDate,
+                          endDate: course.endDate,
+                          department: course.department,
+                          credits: course.credits,
+                          description: course.description,
+                        })
+                      );
+                    }}
+                  />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/Courses/:cid/*"
+              element={
+                <ProtectedCourseRoute>
+                  <Courses courses={courses} />
+                </ProtectedCourseRoute>
+              }
+            />
+            <Route path="/Calendar" element={<h1>Calendar</h1>} />
+            <Route path="/Inbox" element={<h1>Inbox</h1>} />
+          </Routes>
+        </div>
       </div>
-    </div>
+    </Session>
   );
 }
