@@ -12,6 +12,9 @@ import { Link, useParams } from "react-router";
 import { addAssignment, updateAssignment } from "./reducer";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import * as coursesClient from "../client";
+import * as assignmentsClient from "./client";
+import { v4 as uuidv4 } from "uuid";
 
 function formatDate(year: number, month: number, day: number) {
   const monthStr = String(month).padStart(2, "0");
@@ -32,7 +35,7 @@ function stringDateToObject(inputDate: string) {
 }
 
 export default function AssignmentEditor() {
-  const { cid, aid } = useParams();
+  let { cid, aid } = useParams();
   const { assignments } = useSelector((state: any) => state.assignmentsReducer);
   const assignment = assignments.find((a: { _id: string }) => a._id === aid);
   const dispatch = useDispatch();
@@ -67,6 +70,49 @@ export default function AssignmentEditor() {
         )
       : "2024-05-13"
   );
+  const saveAssignment = async (assignment: any) => {
+    console.log("nice bro");
+    console.log(assignment);
+
+    await assignmentsClient.updateAssignment(assignment);
+    dispatch(updateAssignment(assignment));
+  };
+
+  const createAssignmentForCourse = async () => {
+    if (!cid) return;
+
+    if (aid === "New") {
+      aid = uuidv4();
+      const newAssignment = {
+        _id: aid,
+        title: title,
+        course: cid,
+        desc: desc,
+        points: points,
+        availableDate: stringDateToObject(availableDate),
+        dueDate: stringDateToObject(dueDate),
+      };
+
+      const assignment = await coursesClient.createAssignmentForCourse(
+        cid,
+        newAssignment
+      );
+      dispatch(addAssignment(assignment));
+    } else {
+      // Updating
+      const newAssignment = {
+        _id: aid,
+        title: title,
+        course: cid,
+        desc: desc,
+        points: points,
+        availableDate: stringDateToObject(availableDate),
+        dueDate: stringDateToObject(dueDate),
+      };
+
+      saveAssignment(newAssignment);
+    }
+  };
 
   return (
     <div id="wd-assignments-editor" className="w-50">
@@ -217,32 +263,7 @@ export default function AssignmentEditor() {
               size="lg"
               className="me-1 float-end"
               id="wd-add-module-btn"
-              onClick={() => {
-                if (aid === "New") {
-                  dispatch(
-                    addAssignment({
-                      title: title,
-                      course: cid,
-                      desc: desc,
-                      points: points,
-                      availableDate: stringDateToObject(availableDate),
-                      dueDate: stringDateToObject(dueDate),
-                    })
-                  );
-                } else {
-                  dispatch(
-                    updateAssignment({
-                      _id: aid,
-                      title: title,
-                      course: cid,
-                      desc: desc,
-                      points: points,
-                      availableDate: stringDateToObject(availableDate),
-                      dueDate: stringDateToObject(dueDate),
-                    })
-                  );
-                }
-              }}
+              onClick={createAssignmentForCourse}
             >
               Save
             </Button>

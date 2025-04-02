@@ -8,9 +8,11 @@ import { TfiWrite } from "react-icons/tfi";
 import { Link } from "react-router-dom";
 import { useNavigate, useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
-import { deleteAssignment } from "./reducer";
+import { useEffect, useState } from "react";
+import { deleteAssignment, setAssignments } from "./reducer";
 import DeleteModal from "./DeleteModal";
+import * as coursesClient from "../client";
+import * as assignmentsClient from "./client";
 
 function formatDate(date: {
   year: number;
@@ -49,6 +51,21 @@ export default function Assignments() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [aid, setAid] = useState("");
+
+  const fetchAssignments = async () => {
+    const assignments = await coursesClient.findAssignmentsForCourse(
+      cid as string
+    );
+    dispatch(setAssignments(assignments));
+  };
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
+
+  const removeAssignment = async (assignmentId: string) => {
+    await assignmentsClient.deleteAssignment(assignmentId);
+    dispatch(deleteAssignment(assignmentId));
+  };
 
   return (
     <div id="wd-assignments">
@@ -165,9 +182,7 @@ export default function Assignments() {
       <DeleteModal
         show={show}
         handleClose={handleClose}
-        deleteAssignment={(assignmentId) =>
-          dispatch(deleteAssignment(assignmentId))
-        }
+        deleteAssignment={(assignmentId) => removeAssignment(assignmentId)}
         aid={aid}
       />
     </div>
