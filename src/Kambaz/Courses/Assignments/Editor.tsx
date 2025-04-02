@@ -71,9 +71,6 @@ export default function AssignmentEditor() {
       : "2024-05-13"
   );
   const saveAssignment = async (assignment: any) => {
-    console.log("nice bro");
-    console.log(assignment);
-
     await assignmentsClient.updateAssignment(assignment);
     dispatch(updateAssignment(assignment));
   };

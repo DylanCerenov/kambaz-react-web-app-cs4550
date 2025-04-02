@@ -80,9 +80,7 @@ export default function Kambaz() {
                     setCourse={setCourse}
                     addNewCourse={() => addNewCourse()}
                     deleteCourse={(courseId) => {
-                      console.log(course._id);
                       deleteCourse(courseId);
-                      console.log(courses);
                     }}
                     updateCourse={() => updateCourse()}
                   />
