@@ -6,14 +6,12 @@ import Courses from "./Courses";
 import "./styles.css";
 import { useEffect, useState } from "react";
 import ProtectedRoute from "./Account/ProtectedRoute";
-import { useDispatch, useSelector } from "react-redux";
-import { addCourse, deleteCourse, updateCourse } from "./Courses/reducer";
+import { useSelector } from "react-redux";
 import ProtectedCourseRoute from "./Courses/ProtectedCourseRoute";
 import Session from "./Account/Session";
 import * as userClient from "./Account/client";
 import * as courseClient from "./Courses/client";
 import { v4 as uuidv4 } from "uuid";
-import { addEnrollment } from "./Dashboard/reducer";
 
 export default function Kambaz() {
   const [courses, setCourses] = useState<any[]>([]);
@@ -29,8 +27,6 @@ export default function Kambaz() {
   useEffect(() => {
     fetchCourses();
   }, [currentUser]);
-
-  const dispatch = useDispatch();
 
   const [course, setCourse] = useState<any>({
     _id: "1234",
@@ -48,7 +44,7 @@ export default function Kambaz() {
   };
 
   const deleteCourse = async (courseId: string) => {
-    const status = await courseClient.deleteCourse(courseId);
+    // const status = await courseClient.deleteCourse(courseId);
     setCourses(courses.filter((course) => course._id !== courseId));
   };
 
