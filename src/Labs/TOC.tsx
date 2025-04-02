@@ -42,7 +42,23 @@ export default function TOC() {
           id="wd-github"
           href="https://github.com/DylanCerenov/kambaz-react-web-app-cs4550"
         >
-          My GitHub
+          Frontend Github
+        </Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link
+          id="wd-github-backend"
+          href="https://github.com/DylanCerenov/kambaz-node-server-app/"
+        >
+          Backend Github
+        </Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link
+          id="wd-backend"
+          href="https://dylanc-kambaz-backend.onrender.com/"
+        >
+          Backend Server
         </Nav.Link>
       </Nav.Item>
     </Nav>
