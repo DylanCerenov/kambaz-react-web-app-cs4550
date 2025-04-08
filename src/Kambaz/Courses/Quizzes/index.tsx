@@ -74,7 +74,7 @@ export default function Quizzes() {
               <BsGripVertical className="me-2" />
               <div className="flex-grow-1">
                 <Link
-                  to={`Kambaz/Courses/${cid}/Quizzes/${quiz._id}`}
+                  to={`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}`}
                   className="text-decoration-none"
                 >
                   <b>{quiz.title}</b>
