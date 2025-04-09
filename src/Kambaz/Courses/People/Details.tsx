@@ -1,11 +1,45 @@
 import { useEffect, useState } from "react";
-import { FaUserCircle } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
 import { useParams, useNavigate } from "react-router";
 import * as client from "../../Account/client";
+import { FaPencil } from "react-icons/fa6";
+import { FaCheck, FaUserCircle } from "react-icons/fa";
+import { FormControl } from "react-bootstrap";
+
 export default function PeopleDetails() {
   const { uid } = useParams();
   const [user, setUser] = useState<any>({});
+
+  const [name, setName] = useState("");
+  const [editing, setEditing] = useState(false);
+  const saveUser = async () => {
+    const [firstName, lastName] = name.split(" ");
+    const updatedUser = { ...user, firstName, lastName };
+    await client.updateUser(updatedUser);
+    setUser(updatedUser);
+    setEditing(false);
+    navigate("/Kambaz/Account/Users");
+  };
+
+  const [email, setEmail] = useState("");
+  const [editingEmail, setEditingEmail] = useState(false);
+  const saveUserEmail = async () => {
+    const updatedUser = { ...user, email: email };
+    await client.updateUser(updatedUser);
+    setUser(updatedUser);
+    setEditingEmail(false);
+    navigate("/Kambaz/Account/Users");
+  };
+
+  const [role, setRole] = useState("");
+  const saveUserRole = async (roleStr: string) => {
+    setRole(roleStr);
+    const updatedUser = { ...user, role: roleStr };
+    await client.updateUser(updatedUser);
+    setUser(updatedUser);
+    navigate("/Kambaz/Account/Users");
+  };
+
   const navigate = useNavigate();
 
   const deleteUser = async (uid: string) => {
@@ -37,10 +71,86 @@ export default function PeopleDetails() {
       </div>
       <hr />
       <div className="text-danger fs-4 wd-name">
-        {" "}
-        {user.firstName} {user.lastName}{" "}
+        {!editing && (
+          <FaPencil
+            onClick={() => setEditing(true)}
+            className="float-end fs-5 mt-2 wd-edit"
+          />
+        )}
+        {editing && (
+          <FaCheck
+            onClick={() => saveUser()}
+            className="float-end fs-5 mt-2 me-2 wd-save"
+          />
+        )}
+        {!editing && (
+          <div className="wd-name" onClick={() => setEditing(true)}>
+            {user.firstName} {user.lastName}
+          </div>
+        )}
+        {user && editing && (
+          <FormControl
+            className="w-50 wd-edit-name"
+            defaultValue={`${user.firstName} ${user.lastName}`}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                saveUser();
+              }
+            }}
+          />
+        )}
       </div>
-      <b>Roles:</b> <span className="wd-roles"> {user.role} </span> <br />
+      <div className="mt-3">
+        {!editingEmail && (
+          <FaPencil
+            onClick={() => setEditingEmail(true)}
+            className="float-end fs-5 wd-edit"
+          />
+        )}
+        {editingEmail && (
+          <FaCheck
+            onClick={() => saveUserEmail()}
+            className="float-end fs-5 wd-save"
+          />
+        )}
+        {!editingEmail && (
+          <div className="wd-name" onClick={() => setEditingEmail(true)}>
+            <b>Email:</b> <span className="wd-email"> {user.email} </span>{" "}
+            <br />
+          </div>
+        )}
+        {user && editingEmail && (
+          <div>
+            <b>Email:</b>
+            <FormControl
+              className="wd-edit-name"
+              type="email"
+              defaultValue={user.email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  saveUserEmail();
+                }
+              }}
+            />
+          </div>
+        )}
+      </div>
+      <div className="wd-name mt-2">
+        <b>Role:</b>{" "}
+        <select
+          value={role}
+          onChange={(e) => saveUserRole(e.target.value)}
+          className="form-select"
+        >
+          <option value="STUDENT">Student</option>
+          <option value="TA">Assistant</option>{" "}
+          <option value="FACULTY">Faculty</option>
+          <option value="ADMIN">Administrator</option>
+        </select>{" "}
+        <br />
+      </div>
       <b>Login ID:</b> <span className="wd-login-id"> {user.loginId} </span>{" "}
       <br />
       <b>Section:</b> <span className="wd-section"> {user.section} </span>{" "}
