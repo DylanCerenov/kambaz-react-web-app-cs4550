@@ -5,20 +5,26 @@ import * as client from "../../Account/client";
 import { FaPencil } from "react-icons/fa6";
 import { FaCheck, FaUserCircle } from "react-icons/fa";
 import { FormControl } from "react-bootstrap";
+import { useSelector } from "react-redux";
 
-export default function PeopleDetails() {
+export default function PeopleDetails({ url }: { url: string }) {
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const isAdmin = currentUser.role === "ADMIN";
+
   const { uid } = useParams();
   const [user, setUser] = useState<any>({});
 
   const [name, setName] = useState("");
   const [editing, setEditing] = useState(false);
+  const navigate = useNavigate();
+
   const saveUser = async () => {
     const [firstName, lastName] = name.split(" ");
     const updatedUser = { ...user, firstName, lastName };
     await client.updateUser(updatedUser);
     setUser(updatedUser);
     setEditing(false);
-    navigate("/Kambaz/Account/Users");
+    navigate(url);
   };
 
   const [email, setEmail] = useState("");
@@ -28,7 +34,7 @@ export default function PeopleDetails() {
     await client.updateUser(updatedUser);
     setUser(updatedUser);
     setEditingEmail(false);
-    navigate("/Kambaz/Account/Users");
+    navigate(url);
   };
 
   const [role, setRole] = useState("");
@@ -37,20 +43,19 @@ export default function PeopleDetails() {
     const updatedUser = { ...user, role: roleStr };
     await client.updateUser(updatedUser);
     setUser(updatedUser);
-    navigate("/Kambaz/Account/Users");
+    navigate(url);
   };
-
-  const navigate = useNavigate();
 
   const deleteUser = async (uid: string) => {
     await client.deleteUser(uid);
-    navigate("/Kambaz/Account/Users");
+    navigate(url);
   };
 
   const fetchUser = async () => {
     if (!uid) return;
     const user = await client.findUserById(uid);
     setUser(user);
+    setRole(user.role);
   };
   useEffect(() => {
     if (uid) fetchUser();
@@ -60,7 +65,7 @@ export default function PeopleDetails() {
   return (
     <div className="wd-people-details position-fixed top-0 end-0 bottom-0 bg-white p-4 shadow w-25">
       <button
-        onClick={() => navigate("/Kambaz/Account/Users")}
+        onClick={() => navigate(url)}
         className="btn position-fixed end-0 top-0 wd-close-details"
       >
         <IoCloseSharp className="fs-1" />{" "}
@@ -71,13 +76,13 @@ export default function PeopleDetails() {
       </div>
       <hr />
       <div className="text-danger fs-4 wd-name">
-        {!editing && (
+        {isAdmin && !editing && (
           <FaPencil
             onClick={() => setEditing(true)}
             className="float-end fs-5 mt-2 wd-edit"
           />
         )}
-        {editing && (
+        {isAdmin && editing && (
           <FaCheck
             onClick={() => saveUser()}
             className="float-end fs-5 mt-2 me-2 wd-save"
@@ -88,7 +93,7 @@ export default function PeopleDetails() {
             {user.firstName} {user.lastName}
           </div>
         )}
-        {user && editing && (
+        {isAdmin && user && editing && (
           <FormControl
             className="w-50 wd-edit-name"
             defaultValue={`${user.firstName} ${user.lastName}`}
@@ -102,13 +107,13 @@ export default function PeopleDetails() {
         )}
       </div>
       <div className="mt-3">
-        {!editingEmail && (
+        {isAdmin && !editingEmail && (
           <FaPencil
             onClick={() => setEditingEmail(true)}
             className="float-end fs-5 wd-edit"
           />
         )}
-        {editingEmail && (
+        {isAdmin && editingEmail && (
           <FaCheck
             onClick={() => saveUserEmail()}
             className="float-end fs-5 wd-save"
@@ -120,7 +125,7 @@ export default function PeopleDetails() {
             <br />
           </div>
         )}
-        {user && editingEmail && (
+        {isAdmin && user && editingEmail && (
           <div>
             <b>Email:</b>
             <FormControl
@@ -139,17 +144,22 @@ export default function PeopleDetails() {
       </div>
       <div className="wd-name mt-2">
         <b>Role:</b>{" "}
-        <select
-          value={role}
-          onChange={(e) => saveUserRole(e.target.value)}
-          className="form-select"
-        >
-          <option value="STUDENT">Student</option>
-          <option value="TA">Assistant</option>{" "}
-          <option value="FACULTY">Faculty</option>
-          <option value="ADMIN">Administrator</option>
-        </select>{" "}
-        <br />
+        {isAdmin && (
+          <div>
+            <select
+              value={role}
+              onChange={(e) => saveUserRole(e.target.value)}
+              className="form-select"
+            >
+              <option value="STUDENT">Student</option>
+              <option value="TA">Assistant</option>{" "}
+              <option value="FACULTY">Faculty</option>
+              <option value="ADMIN">Administrator</option>
+            </select>
+            <br />
+          </div>
+        )}
+        {!isAdmin && <span className="wd-role"> {user.role} </span>}
       </div>
       <b>Login ID:</b> <span className="wd-login-id"> {user.loginId} </span>{" "}
       <br />
@@ -157,20 +167,24 @@ export default function PeopleDetails() {
       <br />
       <b>Total Activity:</b>{" "}
       <span className="wd-total-activity">{user.totalActivity}</span> <hr />
-      <button
-        onClick={() => deleteUser(uid)}
-        className="btn btn-danger float-end wd-delete"
-      >
-        {" "}
-        Delete{" "}
-      </button>
-      <button
-        onClick={() => navigate("/Kambaz/Account/Users")}
-        className="btn btn-secondary float-start float-end me-2 wd-cancel"
-      >
-        {" "}
-        Cancel{" "}
-      </button>
+      {isAdmin && (
+        <div>
+          <button
+            onClick={() => deleteUser(uid)}
+            className="btn btn-danger float-end wd-delete"
+          >
+            {" "}
+            Delete{" "}
+          </button>
+          <button
+            onClick={() => navigate(url)}
+            className="btn btn-secondary float-start float-end me-2 wd-cancel"
+          >
+            {" "}
+            Cancel{" "}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

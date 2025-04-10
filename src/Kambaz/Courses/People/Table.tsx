@@ -3,10 +3,16 @@ import { FaUserCircle } from "react-icons/fa";
 import PeopleDetails from "./Details";
 import { Link } from "react-router-dom";
 
-export default function PeopleTable({ users = [] }: { users?: any[] }) {
+export default function PeopleTable({
+  users = [],
+  url,
+}: {
+  users?: any[];
+  url: string;
+}) {
   return (
     <div id="wd-people-table">
-      <PeopleDetails />
+      <PeopleDetails url={url} />
       <Table striped>
         <thead>
           <tr>
@@ -23,7 +29,7 @@ export default function PeopleTable({ users = [] }: { users?: any[] }) {
             <tr key={user._id}>
               <td className="wd-full-name text-nowrap">
                 <Link
-                  to={`/Kambaz/Account/Users/${user._id}`}
+                  to={`${url}/${user._id}`}
                   className="text-decoration-none"
                 >
                   <FaUserCircle className="me-2 fs-1 text-secondary" />

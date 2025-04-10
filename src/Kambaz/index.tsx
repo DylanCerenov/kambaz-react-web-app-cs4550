@@ -11,7 +11,6 @@ import ProtectedCourseRoute from "./Courses/ProtectedCourseRoute";
 import Session from "./Account/Session";
 import * as userClient from "./Account/client";
 import * as courseClient from "./Courses/client";
-import { v4 as uuidv4 } from "uuid";
 
 export default function Kambaz() {
   const [courses, setCourses] = useState<any[]>([]);
