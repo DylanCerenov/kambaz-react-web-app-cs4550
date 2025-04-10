@@ -23,13 +23,14 @@ export default function Modules() {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const isFaculty = currentUser.role === "FACULTY";
-  const fetchModules = async () => {
-    const modules = await coursesClient.findModulesForCourse(cid as string);
+
+  const fetchModulesForCourse = async () => {
+    const modules = await coursesClient.findModulesForCourse(cid!);
     dispatch(setModules(modules));
   };
   useEffect(() => {
-    fetchModules();
-  }, []);
+    fetchModulesForCourse();
+  }, [cid]);
 
   const createModuleForCourse = async () => {
     if (!cid) return;
