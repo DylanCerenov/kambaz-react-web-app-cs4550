@@ -1,4 +1,4 @@
-import { Button, ListGroup } from "react-bootstrap";
+import { Button, ListGroup, Dropdown } from "react-bootstrap";
 import { BsGripVertical } from "react-icons/bs";
 import { FaPlus, FaTrash, FaEllipsisV, FaCheck, FaTimes } from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -8,6 +8,8 @@ import { deleteQuiz, setQuizzes } from "./reducer";
 import * as quizzesClient from "./client";
 import DeleteModal from "./DeleteModal";
 import * as coursesClient from "../client";
+import CopyQuizModal from "./QuizCopyModal";
+
 
 
 export default function Quizzes() {
@@ -23,6 +25,11 @@ export default function Quizzes() {
   const handleShow = () => setShow(true);
   const [qid, setQid] = useState("");
 
+  const [showCopyModal, setShowCopyModal] = useState(false);
+  const [quizToCopy, setQuizToCopy] = useState<any>(null);
+  const [courseList, setCourseList] = useState<any[]>([]);
+  
+  
   const fetchQuizzes = async () => {
     if (!cid) {
       throw new Error("skibidi");
@@ -35,6 +42,16 @@ export default function Quizzes() {
   useEffect(() => {
     fetchQuizzes();
   }, []);
+  const fetchCourses = async () => {
+    const allCourses = await coursesClient.fetchAllCourses();
+    setCourseList(allCourses.filter((c: any) => c._id !== cid)); // exclude current course
+  };
+  
+  useEffect(() => {
+    fetchQuizzes();
+    fetchCourses();
+  }, []);
+  
 
   const removeQuiz = async (quizId: any) => {
     await quizzesClient.deleteQuiz(quizId);
@@ -91,16 +108,21 @@ export default function Quizzes() {
         >
           <BsGripVertical className="me-2" />
           <div className="flex-grow-1">
-            <Link
-              to={`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}`}
-              className="text-decoration-none"
-            >
-              <b>{quiz.title}</b>
-            </Link>
-            <div>
-              {getAvailability(quiz)} | {quiz.points} pts | {quiz["number of questions"]} Questions | Due {quiz["due date"]}
-            </div>
-          </div>
+  {isFaculty ? (
+    <Link
+      to={`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}`}
+      className="text-decoration-none"
+    >
+      <b>{quiz.title}</b>
+    </Link>
+  ) : (
+    <b>{quiz.title}</b>
+  )}
+  <div>
+    {getAvailability(quiz)} | {quiz.points} pts | {quiz["number of questions"]} Questions | Due {quiz["due date"]}
+  </div>
+</div>
+
 
           {/* Only show to faculty */}
           {isFaculty && (
@@ -113,11 +135,40 @@ export default function Quizzes() {
                 )}
               </Button>
 
-              <FaEllipsisV
-                className="ms-2"
-                onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/edit`)}
-                style={{ cursor: "pointer" }}
-              />
+              {isFaculty && (
+  <Dropdown className="ms-2">
+    <Dropdown.Toggle
+      as="div"
+      style={{ cursor: "pointer" }}
+      id={`dropdown-${quiz._id}`}
+    >
+      <FaEllipsisV />
+    </Dropdown.Toggle>
+
+    <Dropdown.Menu>
+      <Dropdown.Item onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/edit`)}>
+        Edit
+      </Dropdown.Item>
+      <Dropdown.Item
+        onClick={() => {
+          setQid(quiz._id);
+          handleShow();
+        }}
+      >
+        Delete
+      </Dropdown.Item>
+      <Dropdown.Item
+  onClick={() => {
+    setQuizToCopy(quiz);
+    setShowCopyModal(true);
+  }}
+>
+  Copy
+</Dropdown.Item>
+    </Dropdown.Menu>
+  </Dropdown>
+)}
+
 
               <FaTrash
                 className="text-danger ms-2"
@@ -131,7 +182,22 @@ export default function Quizzes() {
         </ListGroup.Item>
       ))
   )}
+
 </ListGroup>
+<CopyQuizModal
+  show={showCopyModal}
+  handleClose={() => setShowCopyModal(false)}
+  handleCopy={async (destinationCid) => {
+  const copiedQuiz = { ...quizToCopy };
+  delete copiedQuiz._id;
+  copiedQuiz.title += " (Copy)";
+  await quizzesClient.createQuiz(destinationCid, copiedQuiz);
+  fetchQuizzes();
+}}
+
+  courseList={courseList}
+  quiz={quizToCopy}
+/>
 
       <DeleteModal
         show={show}
