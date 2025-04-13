@@ -9,6 +9,7 @@ import * as quizzesClient from "./client";
 import DeleteModal from "./DeleteModal";
 import * as coursesClient from "../client";
 
+
 export default function Quizzes() {
   const { cid } = useParams();
   const { quizzes } = useSelector((state: any) => state.quizzesReducer);
@@ -40,11 +41,12 @@ export default function Quizzes() {
     dispatch(deleteQuiz(quizId));
   };
 
-  const togglePublish = (quiz: any) => {
-    quiz.published = !quiz.published;
-    quizzesClient.updateQuiz(quiz._id);
+  const togglePublish = async (quiz: any) => {
+    const updatedQuiz = { ...quiz, published: !quiz.published };
+    await quizzesClient.updateQuiz(updatedQuiz);
     fetchQuizzes();
   };
+  
 
   const getAvailability = (quiz: any) => {
     const now = new Date();
@@ -77,34 +79,40 @@ export default function Quizzes() {
       </div>
       <br />
       <ListGroup className="rounded-0" id="wd-quizzes-list">
-        {quizzes.length === 0 ? (
-          <p>No quizzes available. Click "Add Quiz" to create one.</p>
-        ) : (
-          quizzes.map((quiz: any) => (
-            <ListGroup.Item
-              key={quiz._id}
-              className="d-flex align-items-center"
+  {quizzes.length === 0 ? (
+    <p>No quizzes available. Click "Add Quiz" to create one.</p>
+  ) : (
+    quizzes
+      .filter((quiz: any) => isFaculty || quiz.published) // Students only see published quizzes
+      .map((quiz: any) => (
+        <ListGroup.Item
+          key={quiz._id}
+          className="d-flex align-items-center"
+        >
+          <BsGripVertical className="me-2" />
+          <div className="flex-grow-1">
+            <Link
+              to={`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}`}
+              className="text-decoration-none"
             >
-              <BsGripVertical className="me-2" />
-              <div className="flex-grow-1">
-                <Link
-                  to={`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}`}
-                  className="text-decoration-none"
-                >
-                  <b>{quiz.title}</b>
-                </Link>
-                <div>
-  {getAvailability(quiz)} | {quiz.points} pts | {quiz["number of questions"]} Questions | Due {quiz["due date"]}
-</div>
+              <b>{quiz.title}</b>
+            </Link>
+            <div>
+              {getAvailability(quiz)} | {quiz.points} pts | {quiz["number of questions"]} Questions | Due {quiz["due date"]}
+            </div>
+          </div>
 
-              </div>
-              <Button variant="link" onClick={() => togglePublish(quiz)}>
+          {/* Only show to faculty */}
+          {isFaculty && (
+            <>
+              <Button variant="link" onClick={async () => await togglePublish(quiz)}>
                 {quiz.published ? (
                   <FaCheck className="text-success" />
                 ) : (
                   <FaTimes className="text-danger" />
                 )}
               </Button>
+
               <FaEllipsisV
                 className="ms-2"
                 onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/edit`)}
@@ -118,10 +126,13 @@ export default function Quizzes() {
                   handleShow();
                 }}
               />
-            </ListGroup.Item>
-          ))
-        )}
-      </ListGroup>
+            </>
+          )}
+        </ListGroup.Item>
+      ))
+  )}
+</ListGroup>
+
       <DeleteModal
         show={show}
         handleClose={handleClose}
