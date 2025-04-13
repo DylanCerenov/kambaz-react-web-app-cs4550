@@ -1,227 +1,319 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { updateQuiz, addQuiz } from "./reducer";
+import { addQuiz, updateQuiz } from "./reducer"; //addQuiz
 import { v4 as uuidv4 } from "uuid";
+import * as quizClient from "./client";
+import * as coursesClient from "../client";
+function formatDate(year: number, month: number, day: number) {
+    const monthStr = String(month).padStart(2, "0");
+    const dayStr = String(day).padStart(2, "0");
+    return `${year}-${monthStr}-${dayStr}`;
+  }
+  function stringDateToObject(inputDate: string) {
+    const [year, month, day] = inputDate.split("-").map(Number);
+  
+    return {
+      year: year,
+      month: month,
+      day: day,
+      hour: 0,
+      minute: 0,
+    };
+  }
+
+
 
 export default function QuizEditor() {
-  const { cid, qid } = useParams();
+  let { cid, qid } = useParams();
+  const {quizzes} = useSelector((state: any) => state.quizzesReducer);
+  const quiz = quizzes.find((q: {_id: string}) => q._id === qid);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const quizzes = useSelector((state: any) => state.quizzesReducer.quizzes);
-  const editing = qid !== "new";
-  const quizToEdit = quizzes.find((q: any) => q._id === qid);
+  const [title, setTitle] = useState(quiz?.title || "");
+  const [points, setPoints] = useState(quiz?.points || 0);
+  const [quizType, setQuizType] = useState(quiz?.["quiz type"] || "Graded Quiz");
+  const [assignmentGroup, setAssignmentGroup] = useState(quiz?.["assignment group"] || "Quizzes");
+  const [shuffleAnswers, setShuffleAnswers] = useState(quiz?.["shuffle answers"] || "No");
+  const [timeLimit, setTimeLimit] = useState(quiz?.["time limit"] || "");
+  const [multipleAttempts, setMultipleAttempts] = useState(quiz?.["multiple attempts"] || "No");
+  const [howManyAttempts, setHowManyAttempts] = useState(quiz?.["how many attempts"] || "");
+  const [showCorrectAnswers, setShowCorrectAnswers] = useState(quiz?.["show correct answers"] || "No");
+  const [accessCode, setAccessCode] = useState(quiz?.["access code"] || "");
+  const [oneQuestionAtATime, setOneQuestionAtATime] = useState(quiz?.["one question at a time"] || "No");
+  const [webcamRequired, setWebcamRequired] = useState(quiz?.["webcam required"] || "No");
+  const [lockQuestions, setLockQuestions] = useState(quiz?.["lock questions after answering"] || "No");
 
-  const [quiz, setQuiz] = useState<any>({
-    _id: uuidv4(),
-    title: "",
-    points: 0,
-    course: cid,
-    desc: "",
-    "quiz type": "Graded Quiz",
-    "assignment group": "Quizzes",
-    "shuffle answers": "No",
-    "time limit": "",
-    "multiple attempts": "No",
-    "how many attempts": "",
-    "show correct answers": "No",
-    "access code": "",
-    "one question at a time": "No",
-    "webcam required": "No",
-    "lock questions after answering": "No",
-    "due date": "",
-    "available date": "",
-    "until date": "",
-  });
+  const [dueDate, setDueDate] = useState(
+    quiz ? formatDate(quiz.dueDate.year, quiz.dueDate.month, quiz.dueDate.day) : "2024-05-13"
+  );
+  const [availableDate, setAvailableDate] = useState(
+    quiz ? formatDate(quiz.availableDate.year, quiz.availableDate.month, quiz.availableDate.day) : "2024-05-06"
+  );
+  const [untilDate, setUntilDate] = useState(
+    quiz ? formatDate(quiz.dueDate.year, quiz.dueDate.month, quiz.dueDate.day) : "2024-05-13"
+  );
 
-  useEffect(() => {
-    if (editing && quizToEdit) {
-      setQuiz(quizToEdit);
+  const saveQuiz = async (quiz: any) => {
+    console.log("Quiz sasving",quiz);
+    await quizClient.updateQuiz(quiz);
+    dispatch(updateQuiz(quiz));
+    };
+
+    const createUpdateQuiz = async () => {
+        if (!cid) return;
+
+        if (qid === "New"){
+            qid = uuidv4();
+        const newQuiz = {
+            _id: qid,
+            title: title,
+            course: cid,
+            points: points,
+            quizType: quizType,
+            assignmentGroup: assignmentGroup,
+            shuffleAnswers: shuffleAnswers,
+            timeLimit: timeLimit,
+            multipleAttempts: multipleAttempts,
+            howManyAttempts: howManyAttempts,
+            showCorrectAnswers: showCorrectAnswers,
+            accessCode: accessCode,
+            oneQuestionAtATime: oneQuestionAtATime,
+            webcamRequired: webcamRequired,
+            lockQuestionsAfterAnswering: lockQuestions,
+            dueDate: stringDateToObject(dueDate),
+            availableDate: stringDateToObject(availableDate),
+            untilDate: stringDateToObject(untilDate),
+         }; 
+
+         const quizTemp = await coursesClient.createQuizForCourse(
+            cid,
+            newQuiz
+         );
+         dispatch(addQuiz(quizTemp));
+        } else{
+            const newQuiz ={
+                _id: qid,
+                title: title,
+                course: cid,
+                points: points,
+                quizType: quizType,
+                assignmentGroup: assignmentGroup,
+                shuffleAnswers: shuffleAnswers,
+                timeLimit: timeLimit,
+                multipleAttempts: multipleAttempts,
+                howManyAttempts: howManyAttempts,
+                showCorrectAnswers: showCorrectAnswers,
+                accessCode: accessCode,
+                oneQuestionAtATime: oneQuestionAtATime,
+                webcamRequired: webcamRequired,
+                lockQuestionsAfterAnswering: lockQuestions,
+                dueDate: stringDateToObject(dueDate),
+                availableDate: stringDateToObject(availableDate),
+                untilDate: stringDateToObject(untilDate),
+
+            };
+
+            saveQuiz(newQuiz);
+        }
+
+        navigate(`/Kambaz/Courses/${cid}/Quizzes`)
+
     }
-  }, [editing, quizToEdit]);
+// const createUpdateQuiz = async () => {
+//     if (!qid) return;
+//     //need to do an if new #sorry not doing now
 
-  const handleChange = (key: string, value: any) => {
-    setQuiz({ ...quiz, [key]: value });
-  };
+//     const quiz = await quizClient.createQuizForCourse(
+//         qid, 
+//     )
 
-  const handleSubmit = () => {
-    if (editing) {
-      dispatch(updateQuiz(quiz));
-    } else {
-      dispatch(addQuiz(quiz));
-    }
-    navigate(`/Kambaz/Courses/${cid}/Quizzes`);
-  };
+//     const quizObj = {
+//       _id: editing ? quiz._id : uuidv4(),
+//       title,
+//       course: cid,
+//       points,
+//       quizType,
+//       assignmentGroup,
+//       shuffleAnswers,
+//       timeLimit,
+//       multipleAttempts,
+//       howManyAttempts,
+//       showCorrectAnswers,
+//       accessCode,
+//       oneQuestionAtATime,
+//       webcamRequired,
+//       lockQuestionsAfterAnswering: lockQuestions,
+//       dueDate: stringDateToObject(dueDate),
+//       availableDate: stringDateToObject(availableDate),
+//       untilDate: stringDateToObject(untilDate),
+//     };
+  
+//     console.log("This is the edited title calling title", title);
+//     console.log("This is the edited title calling calling obj", quizObj.title);
+//     console.log("Quiz is,", quizObj);
+//     dispatch(updateQuiz(quizObj));
+ 
+
+    
+//     navigate(`/Kambaz/Courses/${cid}/Quizzes`);
+//   };
+  
 
   return (
     <div className="container mt-4">
-      <h2>{editing ? "Edit Quiz" : "Create Quiz"}</h2>
-      <div className="form-group mt-3">
-        <label>Title</label>
-        <input
-          className="form-control"
-          value={quiz.title}
-          onChange={(e) => handleChange("title", e.target.value)}
-        />
-      </div>
+      <h2>{"Edit Quiz"}</h2>
 
+      <div className="form-group mt-2">
+        <label>Title</label>
+        <input className="form-control" value={title} onChange={(e) => setTitle(e.target.value)} />
+      </div>
       <div className="form-group mt-2">
         <label>Points</label>
         <input
           type="number"
           className="form-control"
-          value={quiz.points}
-          onChange={(e) => handleChange("points", e.target.value)}
+          value={points}
+          onChange={(e) => setPoints(Number(e.target.value))}
         />
       </div>
+
       <div className="form-group mt-2">
         <label>Quiz Type</label>
-        <select
-          className="form-control"
-          value={quiz["quiz type"]}
-          onChange={(e) => handleChange("quiz type", e.target.value)}
-        >
+        <select className="form-control" value={quizType} onChange={(e) => setQuizType(e.target.value)}>
           <option>Graded Quiz</option>
           <option>Practice Quiz</option>
-          <option>Survey</option>
+          <option>Graded Survey</option>
+          <option>Ungraded Survey</option>
         </select>
       </div>
+
       <div className="form-group mt-2">
         <label>Assignment Group</label>
-        <input
-          className="form-control"
-          value={quiz["assignment group"]}
-          onChange={(e) => handleChange("assignment group", e.target.value)}
-        />
+        <select className="form-control" value={assignmentGroup} onChange={(e) => setAssignmentGroup(e.target.value)}>
+          <option>Quizzes</option>
+          <option>Exams</option>
+          <option>Assignments</option>
+          <option>Project</option>
+        </select>
       </div>
+
       <div className="form-group mt-2">
         <label>Shuffle Answers</label>
-        <select
-          className="form-control"
-          value={quiz["shuffle answers"]}
-          onChange={(e) => handleChange("shuffle answers", e.target.value)}
-        >
+        <select className="form-control" value={shuffleAnswers} onChange={(e) => setShuffleAnswers(e.target.value)}>
           <option>Yes</option>
           <option>No</option>
         </select>
       </div>
+
       <div className="form-group mt-2">
         <label>Time Limit (minutes)</label>
         <input
           type="number"
           className="form-control"
-          value={quiz["time limit"]}
-          onChange={(e) => handleChange("time limit", e.target.value)}
+          value={timeLimit}
+          onChange={(e) => setTimeLimit(e.target.value)}
         />
       </div>
+
       <div className="form-group mt-2">
         <label>Multiple Attempts</label>
-        <select
-          className="form-control"
-          value={quiz["multiple attempts"]}
-          onChange={(e) => handleChange("multiple attempts", e.target.value)}
-        >
+        <select className="form-control" value={multipleAttempts} onChange={(e) => setMultipleAttempts(e.target.value)}>
           <option>Yes</option>
           <option>No</option>
         </select>
       </div>
-      {quiz["multiple attempts"] === "Yes" && (
+
+      {multipleAttempts === "Yes" && (
         <div className="form-group mt-2">
           <label>How Many Attempts</label>
           <input
             type="number"
             className="form-control"
-            value={quiz["how many attempts"]}
-            onChange={(e) => handleChange("how many attempts", e.target.value)}
+            value={howManyAttempts}
+            onChange={(e) => setHowManyAttempts(e.target.value)}
           />
         </div>
       )}
+
       <div className="form-group mt-2">
         <label>Show Correct Answers</label>
-        <select
-          className="form-control"
-          value={quiz["show correct answers"]}
-          onChange={(e) => handleChange("show correct answers", e.target.value)}
-        >
+        <select className="form-control" value={showCorrectAnswers} onChange={(e) => setShowCorrectAnswers(e.target.value)}>
           <option>Yes</option>
           <option>No</option>
         </select>
       </div>
+
       <div className="form-group mt-2">
         <label>Access Code</label>
-        <input
-          className="form-control"
-          value={quiz["access code"]}
-          onChange={(e) => handleChange("access code", e.target.value)}
-        />
+        <input className="form-control" value={accessCode} onChange={(e) => setAccessCode(e.target.value)} />
       </div>
+
       <div className="form-group mt-2">
         <label>One Question at a Time</label>
-        <select
-          className="form-control"
-          value={quiz["one question at a time"]}
-          onChange={(e) => handleChange("one question at a time", e.target.value)}
-        >
+        <select className="form-control" value={oneQuestionAtATime} onChange={(e) => setOneQuestionAtATime(e.target.value)}>
           <option>Yes</option>
           <option>No</option>
         </select>
       </div>
+
       <div className="form-group mt-2">
         <label>Webcam Required</label>
-        <select
-          className="form-control"
-          value={quiz["webcam required"]}
-          onChange={(e) => handleChange("webcam required", e.target.value)}
-        >
+        <select className="form-control" value={webcamRequired} onChange={(e) => setWebcamRequired(e.target.value)}>
           <option>Yes</option>
           <option>No</option>
         </select>
       </div>
+
       <div className="form-group mt-2">
         <label>Lock Questions After Answering</label>
-        <select
-          className="form-control"
-          value={quiz["lock questions after answering"]}
-          onChange={(e) =>
-            handleChange("lock questions after answering", e.target.value)
-          }
-        >
+        <select className="form-control" value={lockQuestions} onChange={(e) => setLockQuestions(e.target.value)}>
           <option>Yes</option>
           <option>No</option>
         </select>
       </div>
-      <div className="form-group mt-2">
-        <label>Available Date</label>
-        <input
-          type="date"
-          className="form-control"
-          value={quiz["available date"]}
-          onChange={(e) => handleChange("available date", e.target.value)}
-        />
-      </div>
+
       <div className="form-group mt-2">
         <label>Due Date</label>
         <input
           type="date"
           className="form-control"
-          value={quiz["due date"]}
-          onChange={(e) => handleChange("due date", e.target.value)}
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
         />
       </div>
+
+      <div className="form-group mt-2">
+        <label>Available Date</label>
+        <input
+          type="date"
+          className="form-control"
+          value={availableDate}
+          onChange={(e) => setAvailableDate(e.target.value)}
+        />
+      </div>
+
       <div className="form-group mt-2">
         <label>Until Date</label>
         <input
           type="date"
           className="form-control"
-          value={quiz["until date"]}
-          onChange={(e) => handleChange("until date", e.target.value)}
+          value={untilDate}
+          onChange={(e) => setUntilDate(e.target.value)}
         />
       </div>
-      <button onClick={handleSubmit} className="btn btn-success mt-3">
-        {editing ? "Update Quiz" : "Create Quiz"}
-      </button>
+
+      <div className="mt-4">
+        <button className="btn btn-primary" onClick={createUpdateQuiz}>
+          {"Update Quiz"}
+        </button>
+        <button className="btn btn-secondary ml-2" onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes`)}>
+          Cancel
+        </button>
+      </div>
     </div>
   );
 }
