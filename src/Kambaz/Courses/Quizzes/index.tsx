@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, ListGroup } from "react-bootstrap";
 import { BsGripVertical } from "react-icons/bs";
 import { FaPlus, FaTrash, FaEllipsisV, FaCheck, FaTimes } from "react-icons/fa";
@@ -47,6 +46,20 @@ export default function Quizzes() {
     fetchQuizzes();
   };
 
+  const getAvailability = (quiz: any) => {
+    const now = new Date();
+    const availableDate = new Date(quiz["available date"]);
+    const untilDate = new Date(quiz["until date"]);
+
+    if (now > untilDate) {
+      return "Closed";
+    } else if (now >= availableDate && now <= untilDate) {
+      return "Available";
+    } else {
+      return `Not available until ${quiz["available date"]}`;
+    }
+  };
+
   return (
     <div id="wd-quizzes">
       <div className="d-flex align-items-center w-100">
@@ -81,11 +94,9 @@ export default function Quizzes() {
                   <b>{quiz.title}</b>
                 </Link>
                 <div>
-                  <span>
-                    {quiz.points} pts | {quiz.numberOfQuestions} Questions | Due{" "}
-                    {quiz.dueDate}
-                  </span>
-                </div>
+  {getAvailability(quiz)} | {quiz.points} pts | {quiz["number of questions"]} Questions | Due {quiz["due date"]}
+</div>
+
               </div>
               <Button variant="link" onClick={() => togglePublish(quiz)}>
                 {quiz.published ? (
