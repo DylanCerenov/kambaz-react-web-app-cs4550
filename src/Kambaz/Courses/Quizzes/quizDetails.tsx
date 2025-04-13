@@ -24,7 +24,10 @@ export default function QuizDetails() {
   return (
     <div className="container mt-5">
       <div className="d-flex justify-content-end mb-3">
-        <button className="btn btn-outline-secondary me-2">Preview</button>
+        <button 
+        className="btn btn-outline-secondary me-2"
+        onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/preview`)}
+        >Preview</button>
         <button
           className="btn btn-outline-secondary"
           onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/edit`)}
