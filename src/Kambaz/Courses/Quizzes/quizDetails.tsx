@@ -36,19 +36,18 @@ export default function QuizDetails() {
       <h3 className="fw-semibold mb-4">{quiz.title}</h3>
 
       <div className="mb-4">
-        <div><strong>Quiz Type</strong> &nbsp; {quiz["quiz type"]}</div>
+        <div><strong>Quiz Type</strong> &nbsp; {quiz.quizType}</div>
         <div><strong>Points</strong> &nbsp; {quiz.points}</div>
-        <div><strong>Assignment Group</strong> &nbsp; {quiz["assignment group"]}</div>
-        <div><strong>Shuffle Answers</strong> &nbsp; {quiz["shuffle answers"]}</div>
-        <div><strong>Time Limit</strong> &nbsp; {quiz["time limit"]}</div>
-        <div><strong>Multiple Attempts</strong> &nbsp; {quiz["multiple attempts"]}</div>
-        <div><strong>View Responses</strong> &nbsp; {quiz["view responses"]}</div>
-        <div><strong>Show Correct Answers</strong> &nbsp; {quiz["show correct answers"]}</div>
-        <div><strong>One Question at a Time</strong> &nbsp; {quiz["one question at a time"]}</div>
-        <div><strong>Require Respondus LockDown Browser</strong> &nbsp; {quiz["require lockdown browser"]}</div>
-        <div><strong>Required to View Quiz Results</strong> &nbsp; {quiz["required to view quiz results"]}</div>
-        <div><strong>Webcam Required</strong> &nbsp; {quiz["webcam required"]}</div>
-        <div><strong>Lock Questions After Answering</strong> &nbsp; {quiz["lock questions after answering"]}</div>
+        <div><strong>Assignment Group</strong> &nbsp; {quiz.assignmentGroup}</div>
+        <div><strong>Shuffle Answers</strong> &nbsp; {quiz.shuffleAnswers}</div>
+        <div><strong>Time Limit</strong> &nbsp; {quiz.timeLimit}</div>
+        <div><strong>Multiple Attempts</strong> &nbsp; {quiz.multipleAttempts}</div>
+        <div><strong>View Responses - not in data rn </strong> &nbsp; {}</div>
+        <div><strong>Show Correct Answers</strong> &nbsp; {quiz.showCorrectAnswers}</div>
+        <div><strong>One Question at a Time</strong> &nbsp; {quiz.oneQuestionAtATime}</div>
+        <div><strong>Required to View Quiz Results - not in data rn </strong> &nbsp; {quiz["required to view quiz results"]}</div>
+        <div><strong>Webcam Required</strong> &nbsp; {quiz.webcamRequired}</div>
+        <div><strong>Lock Questions After Answering - not in data</strong> &nbsp; {quiz["lock questions after answering"]}</div>
       </div>
 
       <table className="table w-auto">
