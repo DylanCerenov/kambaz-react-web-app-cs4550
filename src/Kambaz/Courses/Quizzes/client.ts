@@ -11,3 +11,12 @@ export const updateQuiz = async (quiz: any) => {
   const { data } = await axios.put(`${QUIZZES_API}/${quiz._id}`, quiz);
   return data;
 };
+
+export const updateQuizQuestion = async (quizId: string, newQuestion: any) => {
+  const questionId = newQuestion.questionId;
+  const { data } = await axios.put(
+    `${QUIZZES_API}/${quizId}/${questionId}`,
+    newQuestion
+  );
+  return data; // Passes back the entire Quiz.
+};

@@ -96,7 +96,9 @@ export default function Quizzes() {
               </Button>
               <FaEllipsisV
                 className="ms-2"
-                onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/edit`)}
+                onClick={() =>
+                  navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/edit`)
+                }
                 style={{ cursor: "pointer" }}
               />
 
