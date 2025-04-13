@@ -1,6 +1,6 @@
 import { Button, ListGroup, Dropdown } from "react-bootstrap";
 import { BsGripVertical } from "react-icons/bs";
-import { FaPlus, FaTrash, FaEllipsisV, FaCheck, FaTimes } from "react-icons/fa";
+import { FaPlus, FaTrash, FaEllipsisV, FaCheck } from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import * as quizzesClient from "./client";
 import DeleteModal from "./DeleteModal";
 import * as coursesClient from "../client";
 import CopyQuizModal from "./QuizCopyModal";
+import { MdDoNotDisturb } from "react-icons/md";
 
 
 
@@ -84,14 +85,40 @@ export default function Quizzes() {
       <div className="d-flex align-items-center w-100">
         {isFaculty && (
           <Button
-            variant="primary"
-            size="lg"
-            className="ms-auto"
-            id="wd-add-quiz"
-            onClick={() => navigate(`Kambaz/Courses/${cid}/Quizzes/new`)}
-          >
-            <FaPlus className="me-2" /> Quiz
-          </Button>
+          variant="primary"
+          size="lg"
+          className="ms-auto"
+          id="wd-add-quiz"
+          onClick={async () => {
+            const newQuiz = {
+              title: "New Quiz",
+              points: 0,
+              published: false,
+              "number of questions": 0,
+              "available date": new Date().toISOString(),
+              "until date": new Date().toISOString(),
+              "due date": new Date().toISOString(),
+              "quiz type": "Graded Quiz",
+              "assignment group": "Quizzes",
+              "shuffle answers": true,
+              "time limit": 20,
+              "multiple attempts": false,
+              "how many attempts": 1,
+              "show correct answers": "Never",
+              "access code": "",
+              "one question at a time": true,
+              "webcam required": false,
+              "lock questions after answering": false
+            };
+        
+            const createdQuiz = await quizzesClient.createQuiz(cid!, newQuiz);
+            fetchQuizzes();
+            navigate(`/Kambaz/Courses/${cid}/Quizzes/${createdQuiz._id}`);
+          }}
+        >
+          <FaPlus className="me-2" /> Quiz
+        </Button>
+        
         )}
       </div>
       <br />
@@ -131,7 +158,7 @@ export default function Quizzes() {
                 {quiz.published ? (
                   <FaCheck className="text-success" />
                 ) : (
-                  <FaTimes className="text-danger" />
+                <MdDoNotDisturb className="text-danger" />
                 )}
               </Button>
 
