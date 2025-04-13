@@ -146,26 +146,29 @@ export default function Quizzes() {
     </Dropdown.Toggle>
 
     <Dropdown.Menu>
-      <Dropdown.Item onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/edit`)}>
-        Edit
-      </Dropdown.Item>
-      <Dropdown.Item
-        onClick={() => {
-          setQid(quiz._id);
-          handleShow();
-        }}
-      >
-        Delete
-      </Dropdown.Item>
-      <Dropdown.Item
-  onClick={() => {
-    setQuizToCopy(quiz);
-    setShowCopyModal(true);
-  }}
->
-  Copy
-</Dropdown.Item>
-    </Dropdown.Menu>
+  <Dropdown.Item onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/edit`)}>
+    Edit
+  </Dropdown.Item>
+  <Dropdown.Item
+    onClick={() => {
+      setQid(quiz._id);
+      handleShow();
+    }}
+  >
+    Delete
+  </Dropdown.Item>
+  <Dropdown.Item onClick={async () => await togglePublish(quiz)}>
+    {quiz.published ? "Unpublish" : "Publish"}
+  </Dropdown.Item>
+  <Dropdown.Item
+    onClick={() => {
+      setQuizToCopy(quiz);
+      setShowCopyModal(true);
+    }}
+  >
+    Copy
+  </Dropdown.Item>
+</Dropdown.Menu>
   </Dropdown>
 )}
 
