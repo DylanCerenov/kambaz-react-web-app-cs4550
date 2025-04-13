@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, ListGroup } from "react-bootstrap";
 import { BsGripVertical } from "react-icons/bs";
 import { FaPlus, FaTrash, FaEllipsisV, FaCheck, FaTimes } from "react-icons/fa";
@@ -93,7 +94,12 @@ export default function Quizzes() {
                   <FaTimes className="text-danger" />
                 )}
               </Button>
-              <FaEllipsisV className="ms-2" />
+              <FaEllipsisV
+                className="ms-2"
+                onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/edit`)}
+                style={{ cursor: "pointer" }}
+              />
+
               <FaTrash
                 className="text-danger ms-2"
                 onClick={() => {
