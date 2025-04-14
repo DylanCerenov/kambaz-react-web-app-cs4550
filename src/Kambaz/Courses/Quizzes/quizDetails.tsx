@@ -1,10 +1,11 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import * as coursesClient from "../client";
 
 export default function QuizDetails() {
   const { cid, qid } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [quiz, setQuiz] = useState<any>(null);
 
   useEffect(() => {
@@ -17,7 +18,9 @@ export default function QuizDetails() {
     };
 
     fetchQuiz();
-  }, [cid, qid]);
+    // Using location here to force the component to reload when navigating
+    // back from the details editor.
+  }, [cid, qid, location.key]);
 
   if (!quiz) return <div>Loading...</div>;
 
@@ -31,7 +34,7 @@ export default function QuizDetails() {
             navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/edit`)
           }
         >
-          Edit
+          Quiz Details Editor
         </button>
 
         <button
@@ -40,7 +43,7 @@ export default function QuizDetails() {
             navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/Questions`)
           }
         >
-          Edit Questions
+          Quiz Questions Editor
         </button>
       </div>
 

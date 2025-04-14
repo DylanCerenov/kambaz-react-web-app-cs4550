@@ -10,8 +10,8 @@ import {
 } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, Form, Link } from "react-router";
-import { updateQuiz, addQuiz } from "../Quizzes/reducer";
-import * as quizzesClient from "./client";
+import { updateQuiz, addQuiz } from "../reducer";
+import * as quizzesClient from "../client";
 import { v4 as uuidv4 } from "uuid";
 
 /*
@@ -36,8 +36,7 @@ export default function MultipleChoiceQuestionEditor(
   titleParameter: string,
   questionTextParameter: string,
   pointsParameter: number,
-  optionsParameter: string[],
-  answerParameter: string
+  optionsParameter: string[]
 ) {
   let { cid, quizId, questionId } = useParams();
   const dispatch = useDispatch();
@@ -46,7 +45,7 @@ export default function MultipleChoiceQuestionEditor(
   const [questionText, setQuestionText] = useState(questionTextParameter);
   const [points, setPoints] = useState(pointsParameter);
   const [choices, setChoices] = useState(optionsParameter);
-  const [answer, setAnswer] = useState(answerParameter);
+  // const [answer, setAnswer] = useState(answerParameter);
 
   const updateQuestion = async () => {
     if (!cid || !quizId) {
@@ -59,7 +58,7 @@ export default function MultipleChoiceQuestionEditor(
       points: points,
       question: questionText,
       choices: choices,
-      answer: answer,
+      // answer: answer,
     };
 
     // Design choice:
@@ -99,7 +98,7 @@ export default function MultipleChoiceQuestionEditor(
           onChange={(e) => setQuestionText(e.target.value)}
         />
       </FormGroup>
-      <strong>Answers:</strong>
+      {/* <strong>Answers:</strong>
       {choices.map((option, index) => (
         <FormGroup
           key={index}
@@ -125,7 +124,7 @@ export default function MultipleChoiceQuestionEditor(
             }}
           />
         </FormGroup>
-      ))}
+      ))} */}
       {/* This is the cancel / save stuff. */}
       <div className="wd-flex-row-container">
         <Link
