@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import JsonStringify from "../../../Labs/Lab3/JsonStringify";
 
 /*
 
@@ -22,13 +23,21 @@ Here's an example of how Canvas renders the Questions editor, but feel free to g
 
 */
 export default function QuizDetailsQuestionEditor() {
-  let { cid, quizId } = useParams();
+  let { cid, qid } = useParams();
   const { quizzes } = useSelector((state: any) => state.quizzesReducer);
-  const quiz = quizzes.find((q: { _id: string }) => q._id === quizId);
+  const quiz = quizzes.find((q: { _id: string }) => q._id === qid);
+  const questions = quiz.questions;
 
   return (
     <div>
-      <h1>apples</h1>
+      <h1>Question Editor</h1>
+      {quiz.questions.map((question: any) => (
+        // Get all the quiz questions
+        // Display them
+        // Make them clickable, and if clicked, route to the proper editor.
+
+        <h1>{JSON.stringify(question)}</h1>
+      ))}
     </div>
   );
 }

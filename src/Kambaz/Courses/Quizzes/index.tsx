@@ -33,13 +33,14 @@ export default function Quizzes() {
       throw new Error("skibidi");
     }
 
-    const quizzes = await coursesClient.findQuizzesForCourse(cid);
-    dispatch(setQuizzes(quizzes));
+    const quizzes1 = await coursesClient.findQuizzesForCourse(cid);
+    dispatch(setQuizzes(quizzes1));
   };
 
   useEffect(() => {
     fetchQuizzes();
   }, []);
+
   const fetchCourses = async () => {
     const allCourses = await coursesClient.fetchAllCourses();
     setCourseList(allCourses.filter((c: any) => c._id !== cid)); // exclude current course
