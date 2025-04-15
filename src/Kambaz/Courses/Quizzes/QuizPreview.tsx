@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "react-bootstrap";
-import { useSelector } from "react-redux"; // <-- you forgot this import
+import { useSelector } from "react-redux";
 
 const QuizPreviewScreen = () => {
   const navigate = useNavigate();
   const { qid } = useParams();
+  const { cid } = useParams();
+
 
   const { quizzes } = useSelector((state: any) => state.quizzesReducer);
   const quiz = quizzes.find((q: { _id: string }) => q._id === qid);
@@ -50,91 +53,106 @@ const QuizPreviewScreen = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Quiz Preview: {quiz.title}</h1>
-      {quiz.questions.map((q: any, idx: number) => (
-        <div key={q.questionId} className="mb-6 border-b pb-4">
-          <p className="font-medium">
-            {idx + 1}. {q.question}
-          </p>
+    <div className="container my-4">
+      <h1 className="mb-4">Quiz Preview: {quiz.title}</h1>
 
-          {q.type === "multiple_choice" && (
-            <div className="space-y-2 mt-2">
-              {q.choices.map((c: any) => (
-                <label key={c.id} className="block">
+      {quiz.questions.map((q: any, idx: number) => (
+        <div key={q.questionId} className="card mb-4">
+          <div className="card-body">
+            <h5 className="card-title">
+              {idx + 1}. {q.question}
+            </h5>
+
+            {/* multiple choice */}
+            {q.type === "multiple_choice" && (
+              <div className="mt-2 d-flex flex-column gap-2">
+                {q.choices.map((c: any) => (
+                  <label key={c.id}>
+                    <input
+                      type="radio"
+                      name={q.questionId}
+                      value={c.id}
+                      className="me-2"
+                      disabled={submitted}
+                      checked={answers[q.questionId] === c.id}
+                      onChange={() => handleAnswer(q.questionId, c.id)}
+                    />
+                    {c.text}
+                  </label>
+                ))}
+              </div>
+            )}
+
+            {/* true and false */}
+            {q.type === "true_false" && (
+              <div className="mt-2 d-flex flex-column gap-2">
+                <label>
                   <input
                     type="radio"
                     name={q.questionId}
-                    value={c.id}
+                    value="true"
+                    className="me-2"
                     disabled={submitted}
-                    checked={answers[q.questionId] === c.id}
-                    onChange={() => handleAnswer(q.questionId, c.id)}
-                  />{" "}
-                  {c.text}
+                    checked={answers[q.questionId] === true}
+                    onChange={() => handleAnswer(q.questionId, true)}
+                  />
+                  True
                 </label>
-              ))}
-            </div>
-          )}
+                <label>
+                  <input
+                    type="radio"
+                    name={q.questionId}
+                    value="false"
+                    className="me-2"
+                    disabled={submitted}
+                    checked={answers[q.questionId] === false}
+                    onChange={() => handleAnswer(q.questionId, false)}
+                  />
+                  False
+                </label>
+              </div>
+            )}
 
-          {q.type === "true_false" && (
-            <div className="space-x-4 mt-2">
-              <label>
+            {/* fill in the blank */}
+            {q.type === "fill_in_blank" && (
+              <div className="mt-2">
                 <input
-                  type="radio"
-                  name={q.questionId}
-                  value="true"
+                  type="text"
+                  className="form-control"
                   disabled={submitted}
-                  checked={answers[q.questionId] === true}
-                  onChange={() => handleAnswer(q.questionId, true)}
-                />{" "}
-                True
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name={q.questionId}
-                  value="false"
-                  disabled={submitted}
-                  checked={answers[q.questionId] === false}
-                  onChange={() => handleAnswer(q.questionId, false)}
-                />{" "}
-                False
-              </label>
-            </div>
-          )}
+                  value={answers[q.questionId] || ""}
+                  onChange={(e) => handleAnswer(q.questionId, e.target.value)}
+                />
+              </div>
+            )}
 
-          {q.type === "fill_in_blank" && (
-            <input
-              type="text"
-              className="mt-2 border rounded px-2 py-1"
-              disabled={submitted}
-              value={answers[q.questionId] || ""}
-              onChange={(e) => handleAnswer(q.questionId, e.target.value)}
-            />
-          )}
-
-          {submitted && (
-            <p className="mt-2 text-sm">
-              {checkAnswer(q, answers[q.questionId]) ? (
-                <span className="text-green-600">Correct</span>
-              ) : (
-                <span className="text-red-600">Incorrect</span>
-              )}
-            </p>
-          )}
+            {/* correct or incorrect display after submit */}
+            {submitted && (
+              <p className="mt-2">
+                {checkAnswer(q, answers[q.questionId]) ? (
+                  <span className="text-success fw-semibold">Correct</span>
+                ) : (
+                  <span className="text-danger fw-semibold">Incorrect</span>
+                )}
+              </p>
+            )}
+          </div>
         </div>
       ))}
 
       {!submitted ? (
-        <Button onClick={handleSubmit} className="mt-4">
+        <Button variant="primary" onClick={handleSubmit}>
           Submit Preview
         </Button>
       ) : (
-        <div className="mt-6">
-          <p className="text-lg font-bold">
-            Your Score: {getScore()} / {quiz.points}
+        <div className="mt-4">
+          <p className="fw-bold">
+            Score: {getScore()} / {quiz.points}
           </p>
-          <Button className="mt-2" onClick={() => navigate(`/edit/${quiz._id}`)}>
+          <Button
+            variant="secondary"
+            onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}/Questions`)}
+          >
             Edit Quiz
           </Button>
         </div>
@@ -144,3 +162,5 @@ const QuizPreviewScreen = () => {
 };
 
 export default QuizPreviewScreen;
+
+
