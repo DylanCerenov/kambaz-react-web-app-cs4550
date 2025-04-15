@@ -12,6 +12,7 @@ import Quizzes from "./Quizzes";
 import QuizDetailsQuestionEditor from "./Quizzes/QuizDetailsQuestionEditor";
 import QuestionEditors from "./Quizzes/QuestionEditors";
 import QuizPreviewScreen from "./Quizzes/QuizPreview";
+import TakingQuiz from "./Quizzes/TakingQuiz";
 
 export default function Courses({ courses }: { courses: any[] }) {
   const { cid } = useParams();
@@ -53,6 +54,10 @@ export default function Courses({ courses }: { courses: any[] }) {
             />
             {/* <Route path="Quizzes/:quizId/:questionId" element={<} TODO: come back */}
             <Route path="People" element={<PeopleTable />} />
+            <Route
+              path="Quizzes/:qid/takingquiz"
+              element={<TakingQuiz />}
+            />
           </Routes>
         </div>
       </div>

@@ -12,6 +12,8 @@ import * as coursesClient from "../client";
 import CopyQuizModal from "./QuizCopyModal";
 import { MdDoNotDisturb } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
+
+//to={`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/takingquiz`}
 export default function Quizzes() {
   const { cid } = useParams();
   const { quizzes } = useSelector((state: any) => state.quizzesReducer);
@@ -92,7 +94,7 @@ export default function Quizzes() {
                 _id: uuidv4(),
                 title: "New Quiz",
                 points: 0,
-                published: false,
+                published: true,
                 numberOfQuestions: 0,
                 availableDate: new Date().toISOString(),
                 untilDate: new Date().toISOString(),
@@ -140,8 +142,13 @@ export default function Quizzes() {
                     >
                       <b>{quiz.title}</b>
                     </Link>
-                  ) : (
-                    <b>{quiz.title}</b>
+                  ) : ( 
+                    <Link
+                      to={`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}`}
+                      className="text-decoration-none"
+                    >
+                      <b>{quiz.title}</b>
+                    </Link>
                   )}
                   <div>
                     {getAvailability(quiz)} | {quiz.points} pts |{" "}
