@@ -10,6 +10,8 @@ import * as quizzesClient from "../client";
 import { useDispatch } from "react-redux";
 import { updateQuiz } from "../reducer";
 import { v4 as uuidv4 } from "uuid";
+// Added the FaTrash import:
+import { FaTrash } from "react-icons/fa";
 
 interface PossibleAnswers {
   id: string;
@@ -55,8 +57,6 @@ export default function FillInBlankQuestionEditor({
   };
 
   const addFIBOption = async () => {
-
-
     const newOption =  {
       id: uuidv4(), 
       text: "New Option", 
@@ -99,6 +99,13 @@ export default function FillInBlankQuestionEditor({
       <strong>Answers:</strong>
       {possibleAnswers.map((option, index) => (
         <FormGroup key={option.id} className="mb-3">
+          {/* Added the trash icon before the label */}
+          <FaTrash
+            style={{ cursor: "pointer", marginRight: "8px" }}
+            onClick={() => {
+              setPossibleAnswers((prev) => prev.filter((_, i) => i !== index));
+            }}
+          />
           <FormLabel>Possible Answer:</FormLabel>
           <FormControl
             defaultValue={option.text}
@@ -110,16 +117,18 @@ export default function FillInBlankQuestionEditor({
           />
         </FormGroup>
       ))}
-                          <Button
-            variant="danger"
-            size="lg"
-            className="me-1 float-end"
-            id="wd-add-module-btn"
-            onClick={addFIBOption}
-          >
-            + Add Another Answer
-          </Button>
-          <br /><br /><br />
+
+      <Button
+        variant="danger"
+        size="lg"
+        className="me-1 float-end"
+        id="wd-add-module-btn"
+        onClick={addFIBOption}
+      >
+        + Add Another Answer
+      </Button>
+      <br /><br /><br />
+
       <div className="wd-flex-row-container">
         <Link
           to={`/Kambaz/Courses/${cid}/Quizzes/${quizId}`}

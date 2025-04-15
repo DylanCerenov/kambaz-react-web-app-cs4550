@@ -3,35 +3,14 @@ import {
   FormGroup,
   FormLabel,
   FormControl,
-  Row,
-  Col,
-  FormSelect,
   Button,
 } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, Form, Link } from "react-router";
-import { updateQuiz, addQuiz } from "../reducer";
+import { updateQuiz } from "../reducer";
 import * as quizzesClient from "../client";
 import { v4 as uuidv4 } from "uuid";
-
-/*
-
-Multiple Choice Question Editor
-
-Implement a Multiple choice type question where students need select one correct choice out a list of multiple choices. 
-
-Faculty can configure the following question properties
-- Title (input:text) - the title of the question
-- Points (input:number) - how many points is the question
-- Question (WYSIWYG)
-- Choices (textarea) 
-  - multiple paragraphs of which only one is the correct choice. 
-  - Faculty can add/remove any number of choices. Each choice has a radio button that selects it as the single correct answer.
-- Cancel button discards changes
-- Save/Update Question button saves question
-*/
-
-// By this point, from the QuizDetailsQuestionEditor, pass in the needed question information.
+import { FaTrash } from "react-icons/fa";
 
 interface Choice {
   id: string;
@@ -46,62 +25,54 @@ interface MultipleChoiceQuestionEditorProps {
   optionsParameter: Choice[];
 }
 
-
 export default function MultipleChoiceQuestionEditor({
   titleParameter,
   questionTextParameter,
   pointsParameter,
   optionsParameter,
 }: MultipleChoiceQuestionEditorProps) {
-  let { cid, quizId, questionId } = useParams();
+  const { cid, quizId, questionId } = useParams();
   const dispatch = useDispatch();
 
   const [title, setTitle] = useState(titleParameter);
   const [questionText, setQuestionText] = useState(questionTextParameter);
   const [points, setPoints] = useState(pointsParameter);
   const [choices, setChoices] = useState(optionsParameter);
-  // const [answer, setAnswer] = useState(answerParameter);
 
+  // ----- Update question on the server -----
   const updateQuestion = async () => {
-    if (!cid || !quizId) {
-      return;
-    }
+    if (!cid || !quizId) return;
 
     const newQuestion = {
       questionId: questionId,
       type: "multiple_choice",
-      points: points,
+      points,
       question: questionText,
-      choices: choices,
-      // answer: answer,
+      choices,
     };
 
-    // Design choice:
-    // Sending a PUT to update the quiz question will return the entire quiz back.
-    // Then the quiz is placed back into the reducer to update the local state.
-    const literallyTheEntireQuizObject = await quizzesClient.updateQuizQuestion(
-      quizId,
-      newQuestion
-    );
-    dispatch(updateQuiz(literallyTheEntireQuizObject));
+    const updatedQuiz = await quizzesClient.updateQuizQuestion(quizId, newQuestion);
+    dispatch(updateQuiz(updatedQuiz));
   };
 
-
-  const addMCQOption = async () => {
-
-
-    const newOption =  {
-      id: uuidv4(), 
-      text: "New Option", 
-      isCorrect: false
+  // ----- Add a new option to the choices array -----
+  const addMCQOption = () => {
+    const newOption = {
+      id: uuidv4(),
+      text: "New Option",
+      isCorrect: false,
     };
-
     setChoices([...choices, newOption]);
+  };
+
+  // ----- Delete an option from the choices array -----
+  const deleteMCQOption = (index: number) => {
+    setChoices((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
     <div>
-      <h1>Multiple Choice Editor</h1>;
+      <h1>Multiple Choice Editor</h1>
       <FormGroup className="mb-3" controlId="wd-assignment-name">
         <FormLabel>Title</FormLabel>
         <FormControl
@@ -109,6 +80,7 @@ export default function MultipleChoiceQuestionEditor({
           onChange={(e) => setTitle(e.target.value)}
         />
       </FormGroup>
+
       <FormGroup className="mb-3" controlId="wd-assignment-name">
         <FormLabel>Points</FormLabel>
         <FormControl
@@ -117,6 +89,7 @@ export default function MultipleChoiceQuestionEditor({
           onChange={(e) => setPoints(Number(e.target.value))}
         />
       </FormGroup>
+
       <FormGroup className="mb-3" controlId="wd-textarea">
         <FormLabel>Question</FormLabel>
         <FormControl
@@ -126,64 +99,58 @@ export default function MultipleChoiceQuestionEditor({
           onChange={(e) => setQuestionText(e.target.value)}
         />
       </FormGroup>
+
       <strong>Answers:</strong>
       {choices.map((option, index) => (
-        <FormGroup
-          key={index}
-          className="mb-3"
-          controlId={`wd-textarea-${index}`}
-        >
-          <FormLabel
-            style={{
-              color: option.isCorrect === true ? "green" : "inherit",
-            }}
-          >
+        <FormGroup key={option.id} className="mb-3">
+          <FormLabel style={{ color: option.isCorrect ? "green" : "inherit" }}>
             {option.isCorrect ? "Correct Answer" : "Possible Answer"}
           </FormLabel>
-
-          <FormControl
-            value={option.text}
-            onChange={(e) => {
-              const newChoices = [...choices];
-              newChoices[index].text = e.target.value;
-              setChoices(newChoices);
-            }}
-          />
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <FaTrash
+              style={{ marginRight: 8, cursor: "pointer" }}
+              onClick={() => deleteMCQOption(index)} // <-- call the delete function
+            />
+            <FormControl
+              value={option.text}
+              onChange={(e) => {
+                const newChoices = [...choices];
+                newChoices[index].text = e.target.value;
+                setChoices(newChoices);
+              }}
+            />
+          </div>
         </FormGroup>
       ))}
-                          <Button
-            variant="danger"
-            size="lg"
-            className="me-1 float-end"
-            id="wd-add-module-btn"
-            onClick={addMCQOption}
-          >
-            + Add Another Answer
-          </Button>
-          <br /><br /><br />
-      {/* This is the cancel / save stuff. */}
+
+      <Button
+        variant="danger"
+        size="lg"
+        className="me-1 float-end"
+        onClick={addMCQOption}
+      >
+        + Add Another Answer
+      </Button>
+
+      <br />
+      <br />
+      <br />
+
+      {/* Cancel/Save stuff */}
       <div className="wd-flex-row-container">
         <Link
           to={`/Kambaz/Courses/${cid}/Quizzes/${quizId}`}
           className="wd-dashboard-course-link text-decoration-none text-dark"
         >
-
           <Button
             variant="danger"
             size="lg"
             className="me-1 float-end"
-            id="wd-add-module-btn"
             onClick={updateQuestion}
           >
             Save
           </Button>
-
-          <Button
-            variant="secondary"
-            size="lg"
-            className="me-1 float-end"
-            id="wd-add-module-btn"
-          >
+          <Button variant="secondary" size="lg" className="me-1 float-end">
             Cancel
           </Button>
           <br />
