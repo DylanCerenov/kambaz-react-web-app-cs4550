@@ -32,12 +32,27 @@ Faculty can configure the following question properties
 */
 
 // By this point, from the QuizDetailsQuestionEditor, pass in the needed question information.
-export default function MultipleChoiceQuestionEditor(
-  titleParameter: string,
-  questionTextParameter: string,
-  pointsParameter: number,
-  optionsParameter: string[]
-) {
+
+interface Choice {
+  id: string;
+  text: string;
+  isCorrect: boolean;
+}
+
+interface MultipleChoiceQuestionEditorProps {
+  titleParameter: string;
+  questionTextParameter: string;
+  pointsParameter: number;
+  optionsParameter: Choice[];
+}
+
+
+export default function MultipleChoiceQuestionEditor({
+  titleParameter,
+  questionTextParameter,
+  pointsParameter,
+  optionsParameter,
+}: MultipleChoiceQuestionEditorProps) {
   let { cid, quizId, questionId } = useParams();
   const dispatch = useDispatch();
 
@@ -71,6 +86,19 @@ export default function MultipleChoiceQuestionEditor(
     dispatch(updateQuiz(literallyTheEntireQuizObject));
   };
 
+
+  const addMCQOption = async () => {
+
+
+    const newOption =  {
+      id: uuidv4(), 
+      text: "New Option", 
+      isCorrect: false
+    };
+
+    setChoices([...choices, newOption]);
+  };
+
   return (
     <div>
       <h1>Multiple Choice Editor</h1>;
@@ -98,7 +126,7 @@ export default function MultipleChoiceQuestionEditor(
           onChange={(e) => setQuestionText(e.target.value)}
         />
       </FormGroup>
-      {/* <strong>Answers:</strong>
+      <strong>Answers:</strong>
       {choices.map((option, index) => (
         <FormGroup
           key={index}
@@ -107,30 +135,39 @@ export default function MultipleChoiceQuestionEditor(
         >
           <FormLabel
             style={{
-              color: option === answerParameter ? "green" : "inherit",
+              color: option.isCorrect === true ? "green" : "inherit",
             }}
           >
-            {option === answerParameter ? "Correct Answer" : "Possible Answer"}
+            {option.isCorrect ? "Correct Answer" : "Possible Answer"}
           </FormLabel>
 
           <FormControl
-            as="textarea"
-            rows={3}
-            defaultValue={option}
+            value={option.text}
             onChange={(e) => {
               const newChoices = [...choices];
-              newChoices[index] = e.target.value;
+              newChoices[index].text = e.target.value;
               setChoices(newChoices);
             }}
           />
         </FormGroup>
-      ))} */}
+      ))}
+                          <Button
+            variant="danger"
+            size="lg"
+            className="me-1 float-end"
+            id="wd-add-module-btn"
+            onClick={addMCQOption}
+          >
+            + Add Another Answer
+          </Button>
+          <br /><br /><br />
       {/* This is the cancel / save stuff. */}
       <div className="wd-flex-row-container">
         <Link
           to={`/Kambaz/Courses/${cid}/Quizzes/${quizId}`}
           className="wd-dashboard-course-link text-decoration-none text-dark"
         >
+
           <Button
             variant="danger"
             size="lg"
@@ -149,6 +186,7 @@ export default function MultipleChoiceQuestionEditor(
           >
             Cancel
           </Button>
+          <br />
         </Link>
       </div>
     </div>
