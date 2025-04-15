@@ -9,6 +9,8 @@ import PeopleTable from "./People/Table";
 import QuizDetails from "./Quizzes/QuizDetails";
 import QuizEditor from "./Quizzes/QuizEditor";
 import Quizzes from "./Quizzes";
+import QuizDetailsQuestionEditor from "./Quizzes/QuizDetailsQuestionEditor";
+import QuestionEditors from "./Quizzes/QuestionEditors";
 import QuizPreviewScreen from "./Quizzes/QuizPreview";
 
 export default function Courses({ courses }: { courses: any[] }) {
@@ -37,7 +39,19 @@ export default function Courses({ courses }: { courses: any[] }) {
             <Route path="Quizzes" element={<Quizzes />} />
             <Route path="Quizzes/:qid" element={<QuizDetails />} />
             <Route path="Quizzes/:qid/edit" element={<QuizEditor />} />
-            <Route path="Quizzes/:qid/preview" element={<QuizPreviewScreen />} />
+            <Route
+              path="Quizzes/:qid/preview"
+              element={<QuizPreviewScreen />}
+            />
+            <Route
+              path="Quizzes/:qid/Questions"
+              element={<QuizDetailsQuestionEditor />}
+            />
+            <Route
+              path="Quizzes/:qid/Questions/:questionId"
+              element={<QuestionEditors />}
+            />
+            {/* <Route path="Quizzes/:quizId/:questionId" element={<} TODO: come back */}
             <Route path="People" element={<PeopleTable />} />
           </Routes>
         </div>

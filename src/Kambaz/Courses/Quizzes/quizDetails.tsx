@@ -1,10 +1,11 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import * as coursesClient from "../client";
 
 export default function QuizDetails() {
   const { cid, qid } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [quiz, setQuiz] = useState<any>(null);
 
   useEffect(() => {
@@ -17,7 +18,9 @@ export default function QuizDetails() {
     };
 
     fetchQuiz();
-  }, [cid, qid]);
+    // Using location here to force the component to reload when navigating
+    // back from the details editor.
+  }, [cid, qid, location.key]);
 
   if (!quiz) return <div>Loading...</div>;
 
@@ -30,27 +33,65 @@ export default function QuizDetails() {
         >Preview</button>
         <button
           className="btn btn-outline-secondary"
-          onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/edit`)}
+          onClick={() =>
+            navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/edit`)
+          }
         >
-          Edit
+          Quiz Details Editor
+        </button>
+
+        <button
+          className="btn btn-outline-secondary"
+          onClick={() =>
+            navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/Questions`)
+          }
+        >
+          Quiz Questions Editor
         </button>
       </div>
 
       <h3 className="fw-semibold mb-4">{quiz.title}</h3>
 
       <div className="mb-4">
-        <div><strong>Quiz Type</strong> &nbsp; {quiz.quizType}</div>
-        <div><strong>Points</strong> &nbsp; {quiz.points}</div>
-        <div><strong>Assignment Group</strong> &nbsp; {quiz.assignmentGroup}</div>
-        <div><strong>Shuffle Answers</strong> &nbsp; {quiz.shuffleAnswers}</div>
-        <div><strong>Time Limit</strong> &nbsp; {quiz.timeLimit}</div>
-        <div><strong>Multiple Attempts</strong> &nbsp; {quiz.multipleAttempts}</div>
-        <div><strong>View Responses - not in data rn </strong> &nbsp; {}</div>
-        <div><strong>Show Correct Answers</strong> &nbsp; {quiz.showCorrectAnswers}</div>
-        <div><strong>One Question at a Time</strong> &nbsp; {quiz.oneQuestionAtATime}</div>
-        <div><strong>Required to View Quiz Results - not in data rn </strong> &nbsp; {quiz["required to view quiz results"]}</div>
-        <div><strong>Webcam Required</strong> &nbsp; {quiz.webcamRequired}</div>
-        <div><strong>Lock Questions After Answering - not in data</strong> &nbsp; {quiz["lock questions after answering"]}</div>
+        <div>
+          <strong>Quiz Type</strong> &nbsp; {quiz.quizType}
+        </div>
+        <div>
+          <strong>Points</strong> &nbsp; {quiz.points}
+        </div>
+        <div>
+          <strong>Assignment Group</strong> &nbsp; {quiz.assignmentGroup}
+        </div>
+        <div>
+          <strong>Shuffle Answers</strong> &nbsp; {quiz.shuffleAnswers}
+        </div>
+        <div>
+          <strong>Time Limit</strong> &nbsp; {quiz.timeLimit}
+        </div>
+        <div>
+          <strong>Multiple Attempts</strong> &nbsp; {quiz.multipleAttempts}
+        </div>
+        <div>
+          <strong>View Responses - not in data rn </strong> &nbsp; {}
+        </div>
+        <div>
+          <strong>Show Correct Answers</strong> &nbsp; {quiz.showCorrectAnswers}
+        </div>
+        <div>
+          <strong>One Question at a Time</strong> &nbsp;{" "}
+          {quiz.oneQuestionAtATime}
+        </div>
+        <div>
+          <strong>Required to View Quiz Results - not in data rn </strong>{" "}
+          &nbsp; {quiz["required to view quiz results"]}
+        </div>
+        <div>
+          <strong>Webcam Required</strong> &nbsp; {quiz.webcamRequired}
+        </div>
+        <div>
+          <strong>Lock Questions After Answering - not in data</strong> &nbsp;{" "}
+          {quiz["lock questions after answering"]}
+        </div>
       </div>
 
       <table className="table w-auto">
