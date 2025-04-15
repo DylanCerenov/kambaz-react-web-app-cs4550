@@ -7,6 +7,10 @@ body * {  font-family: Arial, Helvetica, sans-serif;  }
   }
 }
 
+.dropdown-toggle::after {
+  display: none !important;
+}
+
 .list-group.wd > .list-group-item.active {
   color: black;
   background-color: white;
