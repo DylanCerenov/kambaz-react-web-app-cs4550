@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, ListGroup, Dropdown } from "react-bootstrap";
 import { BsGripVertical } from "react-icons/bs";
 import { FaPlus, FaTrash, FaEllipsisV, FaCheck } from "react-icons/fa";
@@ -11,7 +10,8 @@ import DeleteModal from "./DeleteModal";
 import * as coursesClient from "../client";
 import CopyQuizModal from "./QuizCopyModal";
 import { MdDoNotDisturb } from "react-icons/md";
-import { v4 as uuidv4 } from "uuid";
+
+
 export default function Quizzes() {
   const { cid } = useParams();
   const { quizzes } = useSelector((state: any) => state.quizzesReducer);
@@ -63,19 +63,43 @@ export default function Quizzes() {
     fetchQuizzes();
   };
 
-  const getAvailability = (quiz: any) => {
-    const now = new Date();
-    const availableDate = new Date(quiz["available date"]);
-    const untilDate = new Date(quiz["until date"]);
+  const formatDate = (dateObj: any) => {
+    if (!dateObj || typeof dateObj !== "object") return "Invalid date";
+    const { year, month, day, hour, minute } = dateObj;
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    return `${year}-${pad(month)}-${pad(day)} ${pad(hour)}:${pad(minute)}`;
+  };
+  
 
-    if (now > untilDate) {
+  const getAvailability = (quiz: any) => {
+    if (!quiz.availableDate || !quiz.untilDate) return "Availability unknown";
+  
+    const available = new Date(
+      quiz.availableDate.year,
+      quiz.availableDate.month - 1,
+      quiz.availableDate.day,
+      quiz.availableDate.hour,
+      quiz.availableDate.minute
+    );
+    const until = new Date(
+      quiz.untilDate.year,
+      quiz.untilDate.month - 1,
+      quiz.untilDate.day,
+      quiz.untilDate.hour,
+      quiz.untilDate.minute
+    );
+  
+    const now = new Date();
+  
+    if (now > until) {
       return "Closed";
-    } else if (now >= availableDate && now <= untilDate) {
+    } else if (now >= available && now <= until) {
       return "Available";
     } else {
-      return `Not available until ${quiz["available date"]}`;
+      return `Not available until ${formatDate(quiz.availableDate)}`;
     }
   };
+  
 
   return (
     <div id="wd-quizzes">
@@ -88,26 +112,24 @@ export default function Quizzes() {
             id="wd-add-quiz"
             onClick={async () => {
               const newQuiz = {
-
-                _id: uuidv4(),
                 title: "New Quiz",
                 points: 0,
                 published: false,
-                numberOfQuestions: 0,
-                availableDate: new Date().toISOString(),
-                untilDate: new Date().toISOString(),
-                dueDate: new Date().toISOString(),
-                quizType: "Graded Quiz",
-                assignmentGroup: "Quizzes",
-                shuffleAnswers: true,
-                timeLimit: 20,
-                multipleAttempts: false,
-                howManyAttempts: 1,
-                showCorrectAnswers: "Never",
-                accessCode: "",
-                oneQuestionAtATime: true,
-                webcamRequired: false,
-                lockQuestionsAfterAnswering: false,
+                "number of questions": 0,
+                "available date": new Date().toISOString(),
+                "until date": new Date().toISOString(),
+                "due date": new Date().toISOString(),
+                "quiz type": "Graded Quiz",
+                "assignment group": "Quizzes",
+                "shuffle answers": true,
+                "time limit": 20,
+                "multiple attempts": false,
+                "how many attempts": 1,
+                "show correct answers": "Never",
+                "access code": "",
+                "one question at a time": true,
+                "webcam required": false,
+                "lock questions after answering": false,
               };
 
               const createdQuiz = await quizzesClient.createQuiz(cid!, newQuiz);
@@ -143,11 +165,10 @@ export default function Quizzes() {
                   ) : (
                     <b>{quiz.title}</b>
                   )}
-                  <div>
-                    {getAvailability(quiz)} | {quiz.points} pts |{" "}
-                    {quiz["number of questions"]} Questions | Due{" "}
-                    {quiz["due date"]}
-                  </div>
+                 <div>
+      {getAvailability(quiz)} | {quiz.points} pts | {quiz.numberOfQuestions} Questions | Due {formatDate(quiz.dueDate)}
+                </div>
+
                 </div>
 
                 {/* Only show to faculty */}
