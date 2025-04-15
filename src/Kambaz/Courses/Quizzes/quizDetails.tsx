@@ -1,12 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import * as coursesClient from "../client";
-
+import { useSelector } from "react-redux"; 
 export default function QuizDetails() {
   const { cid, qid } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [quiz, setQuiz] = useState<any>(null);
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  //const isFaculty = currentUser.role === "FACULTY";
+  const isStudent = currentUser.role === "STUDENT";
 
   useEffect(() => {
     if (!cid) return;
@@ -26,6 +30,8 @@ export default function QuizDetails() {
 
   return (
     <div className="container mt-5">
+     
+     {!isStudent && (
       <div className="d-flex justify-content-end mb-3">
         <button 
         className="btn btn-outline-secondary me-2"
@@ -49,6 +55,17 @@ export default function QuizDetails() {
           Quiz Questions Editor
         </button>
       </div>
+    )}
+
+
+
+
+
+
+
+
+
+
 
       <h3 className="fw-semibold mb-4">{quiz.title}</h3>
 
@@ -112,6 +129,21 @@ export default function QuizDetails() {
           </tr>
         </tbody>
       </table>
+
+
+
+      {isStudent && (
+        <div className="mt-4 text-center">
+          <button
+            className="btn btn-danger"
+            onClick={() =>
+              navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/takingquiz`)
+            }
+          >
+            Take the Quiz
+          </button>
+        </div>
+      )}
     </div>
   );
 }

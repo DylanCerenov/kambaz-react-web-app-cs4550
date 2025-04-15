@@ -10,8 +10,7 @@ import DeleteModal from "./DeleteModal";
 import * as coursesClient from "../client";
 import CopyQuizModal from "./QuizCopyModal";
 import { MdDoNotDisturb } from "react-icons/md";
-
-
+import { v4 as uuidv4 } from "uuid";
 export default function Quizzes() {
   const { cid } = useParams();
   const { quizzes } = useSelector((state: any) => state.quizzesReducer);
@@ -114,22 +113,22 @@ export default function Quizzes() {
               const newQuiz = {
                 title: "New Quiz",
                 points: 0,
-                published: false,
-                "number of questions": 0,
-                "available date": new Date().toISOString(),
-                "until date": new Date().toISOString(),
-                "due date": new Date().toISOString(),
-                "quiz type": "Graded Quiz",
-                "assignment group": "Quizzes",
-                "shuffle answers": true,
-                "time limit": 20,
-                "multiple attempts": false,
-                "how many attempts": 1,
-                "show correct answers": "Never",
-                "access code": "",
-                "one question at a time": true,
-                "webcam required": false,
-                "lock questions after answering": false,
+                published: true,
+                numberOfQuestions: 0,
+                availableDate: new Date().toISOString(),
+                untilDate: new Date().toISOString(),
+                dueDate: new Date().toISOString(),
+                quizType: "Graded Quiz",
+                assignmentGroup: "Quizzes",
+                shuffleAnswers: true,
+                timeLimit: 20,
+                multipleAttempts: false,
+                howManyAttempts: 1,
+                showCorrectAnswers: "Never",
+                accessCode: "",
+                oneQuestionAtATime: true,
+                webcamRequired: false,
+                lockQuestionsAfterAnswering: false,
               };
 
               const createdQuiz = await quizzesClient.createQuiz(cid!, newQuiz);
@@ -162,8 +161,13 @@ export default function Quizzes() {
                     >
                       <b>{quiz.title}</b>
                     </Link>
-                  ) : (
-                    <b>{quiz.title}</b>
+                  ) : ( 
+                    <Link
+                      to={`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}`}
+                      className="text-decoration-none"
+                    >
+                      <b>{quiz.title}</b>
+                    </Link>
                   )}
                  <div>
       {getAvailability(quiz)} | {quiz.points} pts | {quiz.numberOfQuestions} Questions | Due {formatDate(quiz.dueDate)}
