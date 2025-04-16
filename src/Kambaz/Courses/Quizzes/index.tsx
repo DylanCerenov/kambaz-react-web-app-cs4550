@@ -112,7 +112,7 @@ export default function Quizzes() {
                 title: "New Quiz",
                 points: 0,
                 published: false,
-                numberOfQuestions: 0,
+                questions: [],
                 availableDate: new Date().toISOString(),
                 untilDate: new Date().toISOString(),
                 dueDate: new Date().toISOString(),
@@ -169,7 +169,7 @@ export default function Quizzes() {
                   )}
                   <div>
                     {getAvailability(quiz)} | {quiz.points} pts |{" "}
-                    {quiz.numberOfQuestions} Questions | Due{" "}
+                    {quiz.questions ? quiz.questions.length : 0} Questions | Due{" "}
                     {formatDate(quiz.dueDate)}
                   </div>
                 </div>
