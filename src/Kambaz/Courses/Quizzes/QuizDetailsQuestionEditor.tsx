@@ -42,6 +42,19 @@ export default function QuizDetailsQuestionEditor() {
     navigate(`/Kambaz/Courses/${cid}/Quizzes`);
   };
 
+  const deleteButton = (questionId: any) => {
+    return (
+      <button
+        className="btn btn-danger mt-3"
+        onClick={async () => {
+          setQuiz(await quizzesClient.deleteQuizQuestion(qid, questionId));
+        }}
+      >
+        Delete
+      </button>
+    );
+  };
+
   // helper render functions
   function renderMultipleChoiceQuestion(question: any, index: number) {
     const questionId = question.questionId;
@@ -82,6 +95,7 @@ export default function QuizDetailsQuestionEditor() {
           >
             Edit MCQ
           </button>
+          {deleteButton(questionId)}
         </div>
       </div>
     );
@@ -133,6 +147,7 @@ export default function QuizDetailsQuestionEditor() {
           >
             Edit TFQ
           </button>
+          {deleteButton(questionId)}
         </div>
       </div>
     );
@@ -170,6 +185,7 @@ export default function QuizDetailsQuestionEditor() {
           >
             Edit FITBQ
           </button>
+          {deleteButton(questionId)}
         </div>
       </div>
     );

@@ -34,3 +34,11 @@ export const createQuizQuestion = async (quizId: string, question: any) => {
   const { data } = await axios.post(`${QUIZZES_API}/${quizId}`, question);
   return data; // Passes back the entire Quiz.
 };
+
+export const deleteQuizQuestion = async (
+  quizId: string,
+  questionId: string
+) => {
+  const { data } = await axios.delete(`${QUIZZES_API}/${quizId}/${questionId}`);
+  return data; // Passes back the entire Quiz.
+};
