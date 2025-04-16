@@ -190,10 +190,6 @@ export default function QuizDetailsQuestionEditor() {
     }
   }
 
-  if (!quiz || !quiz.questions) {
-    return <p>Loading quiz...</p>;
-  }
-
   return (
     <div className="container my-4">
       <h1 className="mb-4">Question Editor</h1>

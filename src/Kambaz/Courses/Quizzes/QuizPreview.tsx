@@ -10,7 +10,6 @@ const QuizPreviewScreen = () => {
   const { qid } = useParams();
   const { cid } = useParams();
 
-
   const { quizzes } = useSelector((state: any) => state.quizzesReducer);
   const quiz = quizzes.find((q: { _id: string }) => q._id === qid);
 
@@ -29,11 +28,15 @@ const QuizPreviewScreen = () => {
     } else if (question.type === "true_false") {
       return question.correctAnswerIsTrue === answer;
     } else if (question.type === "fill_in_blank") {
-      return question.possibleAnswers?.some((ans: any) =>
-        ans.caseInsensitive
-          ? ans.text.toLowerCase() === answer.toLowerCase()
-          : ans.text === answer
-      );
+      return question.possibleAnswers?.some((ans: any) => {
+        if (!answer) {
+          return false;
+        } else if (ans.caseInsensitive) {
+          return ans.text.toLowerCase() === answer.toLowerCase();
+        } else {
+          return ans.text === answer;
+        }
+      });
     }
     return false;
   };
@@ -56,111 +59,115 @@ const QuizPreviewScreen = () => {
     <div className="container my-4">
       <h1 className="mb-4">Quiz Preview: {quiz.title}</h1>
 
-      {quiz.questions.map((q: any, idx: number) => (
-        <div key={q.questionId} className="card mb-4">
-          <div className="card-body">
-            <h5 className="card-title">
-              {idx + 1}. {q.question}
-            </h5>
+      {!quiz.questions && <p>No questions yet.</p>}
 
-            {/* multiple choice */}
-            {q.type === "multiple_choice" && (
-              <div className="mt-2 d-flex flex-column gap-2">
-                {q.choices.map((c: any) => (
-                  <label key={c.id}>
+      {quiz.questions &&
+        quiz.questions.map((q: any, idx: number) => (
+          <div key={q.questionId} className="card mb-4">
+            <div className="card-body">
+              <h5 className="card-title">
+                {idx + 1}. {q.question}
+              </h5>
+
+              {/* multiple choice */}
+              {q.type === "multiple_choice" && (
+                <div className="mt-2 d-flex flex-column gap-2">
+                  {q.choices.map((c: any) => (
+                    <label key={c.id}>
+                      <input
+                        type="radio"
+                        name={q.questionId}
+                        value={c.id}
+                        className="me-2"
+                        disabled={submitted}
+                        checked={answers[q.questionId] === c.id}
+                        onChange={() => handleAnswer(q.questionId, c.id)}
+                      />
+                      {c.text}
+                    </label>
+                  ))}
+                </div>
+              )}
+
+              {/* true and false */}
+              {q.type === "true_false" && (
+                <div className="mt-2 d-flex flex-column gap-2">
+                  <label>
                     <input
                       type="radio"
                       name={q.questionId}
-                      value={c.id}
+                      value="true"
                       className="me-2"
                       disabled={submitted}
-                      checked={answers[q.questionId] === c.id}
-                      onChange={() => handleAnswer(q.questionId, c.id)}
+                      checked={answers[q.questionId] === true}
+                      onChange={() => handleAnswer(q.questionId, true)}
                     />
-                    {c.text}
+                    True
                   </label>
-                ))}
-              </div>
-            )}
+                  <label>
+                    <input
+                      type="radio"
+                      name={q.questionId}
+                      value="false"
+                      className="me-2"
+                      disabled={submitted}
+                      checked={answers[q.questionId] === false}
+                      onChange={() => handleAnswer(q.questionId, false)}
+                    />
+                    False
+                  </label>
+                </div>
+              )}
 
-            {/* true and false */}
-            {q.type === "true_false" && (
-              <div className="mt-2 d-flex flex-column gap-2">
-                <label>
+              {/* fill in the blank */}
+              {q.type === "fill_in_blank" && (
+                <div className="mt-2">
                   <input
-                    type="radio"
-                    name={q.questionId}
-                    value="true"
-                    className="me-2"
+                    type="text"
+                    className="form-control"
                     disabled={submitted}
-                    checked={answers[q.questionId] === true}
-                    onChange={() => handleAnswer(q.questionId, true)}
+                    value={answers[q.questionId] || ""}
+                    onChange={(e) => handleAnswer(q.questionId, e.target.value)}
                   />
-                  True
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name={q.questionId}
-                    value="false"
-                    className="me-2"
-                    disabled={submitted}
-                    checked={answers[q.questionId] === false}
-                    onChange={() => handleAnswer(q.questionId, false)}
-                  />
-                  False
-                </label>
-              </div>
-            )}
+                </div>
+              )}
 
-            {/* fill in the blank */}
-            {q.type === "fill_in_blank" && (
-              <div className="mt-2">
-                <input
-                  type="text"
-                  className="form-control"
-                  disabled={submitted}
-                  value={answers[q.questionId] || ""}
-                  onChange={(e) => handleAnswer(q.questionId, e.target.value)}
-                />
-              </div>
-            )}
-
-            {/* correct or incorrect display after submit */}
-            {submitted && (
-              <p className="mt-2">
-                {checkAnswer(q, answers[q.questionId]) ? (
-                  <span className="text-success fw-semibold">Correct</span>
-                ) : (
-                  <span className="text-danger fw-semibold">Incorrect</span>
-                )}
-              </p>
-            )}
+              {/* correct or incorrect display after submit */}
+              {submitted && (
+                <p className="mt-2">
+                  {checkAnswer(q, answers[q.questionId]) ? (
+                    <span className="text-success fw-semibold">Correct</span>
+                  ) : (
+                    <span className="text-danger fw-semibold">Incorrect</span>
+                  )}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
 
-      {!submitted ? (
-        <Button variant="primary" onClick={handleSubmit}>
-          Submit Preview
-        </Button>
-      ) : (
-        <div className="mt-4">
-          <p className="fw-bold">
-            Score: {getScore()} / {quiz.points}
-          </p>
-          <Button
-            variant="secondary"
-            onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}/Questions`)}
-          >
-            Edit Quiz
+      {quiz.questions &&
+        (!submitted ? (
+          <Button variant="primary" onClick={handleSubmit}>
+            Submit Preview
           </Button>
-        </div>
-      )}
+        ) : (
+          <div className="mt-4">
+            <p className="fw-bold">
+              Score: {getScore()} / {quiz.points}
+            </p>
+            <Button
+              variant="secondary"
+              onClick={() =>
+                navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}/Questions`)
+              }
+            >
+              Edit Quiz
+            </Button>
+          </div>
+        ))}
     </div>
   );
 };
 
 export default QuizPreviewScreen;
-
-
