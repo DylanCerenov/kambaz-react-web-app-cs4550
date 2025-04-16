@@ -1,25 +1,8 @@
-
-/*
-Quiz Questions Editor screen
-Clicking Questions tab navigates to Quiz questions screen with the following behavior
-Displays list of questions for this quiz. List is initially empty
-Clicking New Question adds question at bottom of list. Multiple choice question is default
-New questions are displayed in edit preview mode by default
-Clicking Edit displays question in edit mode
-Dropdown to choose question type
-Points shows sum of all the points of each question.
-Minimum question types:
-True/false question
-Multiple choice question
-Fill in a blank question
-Clicking Cancel button dismisses the edits
-Clicking Save saves the edits but does not publish the quiz
-Here's an example of how Canvas renders the Questions editor, but feel free to give it your own twist.
-*/
-
 import { Dropdown } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import * as quizzesClient from "./client";
+import { useEffect, useState } from "react";
 
 export const TYPE_MULTIPLE_CHOICE = "multiple_choice";
 export const TYPE_TRUE_FALSE = "true_false";
@@ -32,6 +15,25 @@ export default function QuizDetailsQuestionEditor() {
   const { quizzes } = useSelector((state: any) => state.quizzesReducer);
   const quiz = quizzes.find((q: { _id: string }) => q._id === qid);
 
+  if (!qid) {
+    throw new Error("Something went wrong.");
+  }
+  // Only store the original quiz.
+  if (!localStorage.getItem(qid)) {
+    localStorage.setItem(qid, JSON.stringify(quiz));
+  }
+
+  const cancelHelper = async () => {
+    const originalQuizCopyJSON = localStorage.getItem(qid);
+    const originalQuizCopy = JSON.parse(originalQuizCopyJSON!);
+    await quizzesClient.updateQuiz(originalQuizCopy);
+    navigate(`/Kambaz/Courses/${cid}/Quizzes`);
+  };
+
+  const saveHelper = async () => {
+    localStorage.setItem(qid, JSON.stringify(quiz));
+    navigate(`/Kambaz/Courses/${cid}/Quizzes`);
+  };
 
   // helper render functions
   function renderMultipleChoiceQuestion(question: any, index: number) {
@@ -181,7 +183,6 @@ export default function QuizDetailsQuestionEditor() {
     }
   }
 
-// render quiz
   if (!quiz) {
     return <p>Something went wrong.</p>;
   }
@@ -194,7 +195,7 @@ export default function QuizDetailsQuestionEditor() {
         renderQuestion(question, index)
       )}
 
-<div className="my-4">
+      <div className="my-4">
         <Dropdown>
           <Dropdown.Toggle variant="danger" id="dropdown-new-question">
             + New Question
@@ -226,15 +227,13 @@ export default function QuizDetailsQuestionEditor() {
         </Dropdown>
       </div>
 
-
       <div className="d-flex gap-3">
-        <button
-          className="btn btn-secondary"
-          onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes`)}
-        >
+        <button className="btn btn-secondary" onClick={cancelHelper}>
           Cancel
         </button>
-        <button className="btn btn-primary">Save</button>
+        <button className="btn btn-primary" onClick={saveHelper}>
+          Save
+        </button>
       </div>
     </div>
   );

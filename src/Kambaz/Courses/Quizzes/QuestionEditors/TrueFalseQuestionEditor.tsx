@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import * as quizzesClient from "../client";
 import { updateQuiz } from "../reducer";
+import { TYPE_TRUE_FALSE } from "../QuizDetailsQuestionEditor";
 
 // 1) Define your props interface:
 interface TrueFalseQuestionEditorProps {
@@ -28,29 +29,33 @@ export default function TrueFalseQuestionEditor({
 }: TrueFalseQuestionEditorProps) {
   // Now TypeScript knows exactly what props we have.
 
-  let { cid, quizId, questionId } = useParams();
+  let { cid, qid, questionId } = useParams();
   const dispatch = useDispatch();
 
   const [title, setTitle] = useState(titleParameter);
   const [questionText, setQuestionText] = useState(questionTextParameter);
   const [points, setPoints] = useState(pointsParameter);
-  const [correctAnswer, setCorrectAnswer] =
-    useState(correctAnswerIsTrueParameter);
+  const [correctAnswer, setCorrectAnswer] = useState(
+    correctAnswerIsTrueParameter
+  );
 
   const updateQuestion = async () => {
-    if (!cid || !quizId) {
+    if (!cid || !qid) {
       return;
     }
 
     const newQuestion = {
       questionId: questionId,
-      type: "true_false",
+      type: TYPE_TRUE_FALSE,
       points: points,
       question: questionText,
       correctAnswerIsTrue: correctAnswer,
     };
 
-    const updatedQuiz = await quizzesClient.updateQuizQuestion(quizId, newQuestion);
+    const updatedQuiz = await quizzesClient.updateQuizQuestion(
+      qid,
+      newQuestion
+    );
     dispatch(updateQuiz(updatedQuiz));
   };
 
@@ -105,7 +110,7 @@ export default function TrueFalseQuestionEditor({
 
       <div className="wd-flex-row-container">
         <Link
-          to={`/Kambaz/Courses/${cid}/Quizzes/${quizId}`}
+          to={`/Kambaz/Courses/${cid}/Quizzes/${qid}/Questions`}
           className="wd-dashboard-course-link text-decoration-none text-dark"
         >
           <Button

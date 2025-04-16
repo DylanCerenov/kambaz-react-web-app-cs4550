@@ -1,16 +1,12 @@
 import { useState } from "react";
-import {
-  FormGroup,
-  FormLabel,
-  FormControl,
-  Button,
-} from "react-bootstrap";
+import { FormGroup, FormLabel, FormControl, Button } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, Form, Link } from "react-router";
 import { updateQuiz } from "../reducer";
 import * as quizzesClient from "../client";
 import { v4 as uuidv4 } from "uuid";
 import { FaTrash } from "react-icons/fa";
+import { TYPE_MULTIPLE_CHOICE } from "../QuizDetailsQuestionEditor";
 
 interface Choice {
   id: string;
@@ -31,7 +27,7 @@ export default function MultipleChoiceQuestionEditor({
   pointsParameter,
   optionsParameter,
 }: MultipleChoiceQuestionEditorProps) {
-  const { cid, quizId, questionId } = useParams();
+  const { cid, qid, questionId } = useParams();
   const dispatch = useDispatch();
 
   const [title, setTitle] = useState(titleParameter);
@@ -39,23 +35,28 @@ export default function MultipleChoiceQuestionEditor({
   const [points, setPoints] = useState(pointsParameter);
   const [choices, setChoices] = useState(optionsParameter);
 
-  // ----- Update question on the server -----
+  // Update question on the server
   const updateQuestion = async () => {
-    if (!cid || !quizId) return;
+    if (!cid || !qid) return;
 
     const newQuestion = {
-      questionId: questionId,
-      type: "multiple_choice",
+      questionId,
+      type: TYPE_MULTIPLE_CHOICE,
+      title,
       points,
       question: questionText,
       choices,
     };
 
-    const updatedQuiz = await quizzesClient.updateQuizQuestion(quizId, newQuestion);
+    const updatedQuiz = await quizzesClient.updateQuizQuestion(
+      qid,
+      newQuestion
+    );
+
     dispatch(updateQuiz(updatedQuiz));
   };
 
-  // ----- Add a new option to the choices array -----
+  // Add a new option to the choices array
   const addMCQOption = () => {
     const newOption = {
       id: uuidv4(),
@@ -65,7 +66,7 @@ export default function MultipleChoiceQuestionEditor({
     setChoices([...choices, newOption]);
   };
 
-  // ----- Delete an option from the choices array -----
+  // Delete an option from the choices array
   const deleteMCQOption = (index: number) => {
     setChoices((prev) => prev.filter((_, i) => i !== index));
   };
@@ -107,10 +108,12 @@ export default function MultipleChoiceQuestionEditor({
             {option.isCorrect ? "Correct Answer" : "Possible Answer"}
           </FormLabel>
           <div style={{ display: "flex", alignItems: "center" }}>
-            <FaTrash
-              style={{ marginRight: 8, cursor: "pointer" }}
-              onClick={() => deleteMCQOption(index)} // <-- call the delete function
-            />
+            {!option.isCorrect && (
+              <FaTrash
+                style={{ marginRight: 8, cursor: "pointer" }}
+                onClick={() => deleteMCQOption(index)} // <-- call the delete function
+              />
+            )}
             <FormControl
               value={option.text}
               onChange={(e) => {
@@ -139,7 +142,7 @@ export default function MultipleChoiceQuestionEditor({
       {/* Cancel/Save stuff */}
       <div className="wd-flex-row-container">
         <Link
-          to={`/Kambaz/Courses/${cid}/Quizzes/${quizId}`}
+          to={`/Kambaz/Courses/${cid}/Quizzes/${qid}/Questions`}
           className="wd-dashboard-course-link text-decoration-none text-dark"
         >
           <Button

@@ -1,10 +1,5 @@
 import { useState } from "react";
-import {
-  Button,
-  FormControl,
-  FormGroup,
-  FormLabel,
-} from "react-bootstrap";
+import { Button, FormControl, FormGroup, FormLabel } from "react-bootstrap";
 import { Link, useParams } from "react-router-dom";
 import * as quizzesClient from "../client";
 import { useDispatch } from "react-redux";
@@ -12,6 +7,7 @@ import { updateQuiz } from "../reducer";
 import { v4 as uuidv4 } from "uuid";
 // Added the FaTrash import:
 import { FaTrash } from "react-icons/fa";
+import { TYPE_FILL_IN_BLANK } from "../QuizDetailsQuestionEditor";
 
 interface PossibleAnswers {
   id: string;
@@ -33,34 +29,39 @@ export default function FillInBlankQuestionEditor({
   questionTextParameter,
   possibleAnswersParameter,
 }: FillInBlankQuestionEditorProps): JSX.Element {
-  let { cid, quizId, questionId } = useParams();
+  let { cid, qid, questionId } = useParams();
   const dispatch = useDispatch();
 
   const [title, setTitle] = useState(titleParameter);
   const [questionText, setQuestionText] = useState(questionTextParameter);
   const [points, setPoints] = useState(pointsParameter);
-  const [possibleAnswers, setPossibleAnswers] = useState(possibleAnswersParameter);
+  const [possibleAnswers, setPossibleAnswers] = useState(
+    possibleAnswersParameter
+  );
 
   const updateQuestion = async () => {
-    if (!cid || !quizId) return;
+    if (!cid || !qid) return;
 
     const newQuestion = {
       questionId: questionId,
-      type: "fill_in_blank",
+      type: TYPE_FILL_IN_BLANK,
       points,
       question: questionText,
       possibleAnswers,
     };
 
-    const updatedQuiz = await quizzesClient.updateQuizQuestion(quizId, newQuestion);
+    const updatedQuiz = await quizzesClient.updateQuizQuestion(
+      qid,
+      newQuestion
+    );
     dispatch(updateQuiz(updatedQuiz));
   };
 
   const addFIBOption = async () => {
-    const newOption =  {
-      id: uuidv4(), 
-      text: "New Option", 
-      caseInsensitive: false
+    const newOption = {
+      id: uuidv4(),
+      text: "New Option",
+      caseInsensitive: false,
     };
 
     setPossibleAnswers([...possibleAnswers, newOption]);
@@ -127,11 +128,13 @@ export default function FillInBlankQuestionEditor({
       >
         + Add Another Answer
       </Button>
-      <br /><br /><br />
+      <br />
+      <br />
+      <br />
 
       <div className="wd-flex-row-container">
         <Link
-          to={`/Kambaz/Courses/${cid}/Quizzes/${quizId}`}
+          to={`/Kambaz/Courses/${cid}/Quizzes/${qid}/Questions`}
           className="wd-dashboard-course-link text-decoration-none text-dark"
         >
           <Button

@@ -10,7 +10,7 @@ import DeleteModal from "./DeleteModal";
 import * as coursesClient from "../client";
 import CopyQuizModal from "./QuizCopyModal";
 import { MdDoNotDisturb } from "react-icons/md";
-import { v4 as uuidv4 } from "uuid";
+
 export default function Quizzes() {
   const { cid } = useParams();
   const { quizzes } = useSelector((state: any) => state.quizzesReducer);
@@ -68,11 +68,10 @@ export default function Quizzes() {
     const pad = (n: number) => n.toString().padStart(2, "0");
     return `${year}-${pad(month)}-${pad(day)} ${pad(hour)}:${pad(minute)}`;
   };
-  
 
   const getAvailability = (quiz: any) => {
     if (!quiz.availableDate || !quiz.untilDate) return "Availability unknown";
-  
+
     const available = new Date(
       quiz.availableDate.year,
       quiz.availableDate.month - 1,
@@ -87,9 +86,9 @@ export default function Quizzes() {
       quiz.untilDate.hour,
       quiz.untilDate.minute
     );
-  
+
     const now = new Date();
-  
+
     if (now > until) {
       return "Closed";
     } else if (now >= available && now <= until) {
@@ -98,7 +97,6 @@ export default function Quizzes() {
       return `Not available until ${formatDate(quiz.availableDate)}`;
     }
   };
-  
 
   return (
     <div id="wd-quizzes">
@@ -161,7 +159,7 @@ export default function Quizzes() {
                     >
                       <b>{quiz.title}</b>
                     </Link>
-                  ) : ( 
+                  ) : (
                     <Link
                       to={`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}`}
                       className="text-decoration-none"
@@ -169,10 +167,11 @@ export default function Quizzes() {
                       <b>{quiz.title}</b>
                     </Link>
                   )}
-                 <div>
-      {getAvailability(quiz)} | {quiz.points} pts | {quiz.numberOfQuestions} Questions | Due {formatDate(quiz.dueDate)}
-                </div>
-
+                  <div>
+                    {getAvailability(quiz)} | {quiz.points} pts |{" "}
+                    {quiz.numberOfQuestions} Questions | Due{" "}
+                    {formatDate(quiz.dueDate)}
+                  </div>
                 </div>
 
                 {/* Only show to faculty */}
