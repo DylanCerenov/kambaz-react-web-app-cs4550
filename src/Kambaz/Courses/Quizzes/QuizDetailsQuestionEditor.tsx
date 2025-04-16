@@ -2,6 +2,7 @@ import { Dropdown } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import * as quizzesClient from "./client";
+import { v4 as uuidv4 } from "uuid";
 import { useEffect, useState } from "react";
 
 export const TYPE_MULTIPLE_CHOICE = "multiple_choice";
@@ -13,7 +14,13 @@ export default function QuizDetailsQuestionEditor() {
   const navigate = useNavigate();
 
   const { quizzes } = useSelector((state: any) => state.quizzesReducer);
-  const quiz = quizzes.find((q: { _id: string }) => q._id === qid);
+  const [quiz, setQuiz] = useState(
+    quizzes.find((q: { _id: string }) => q._id === qid)
+  );
+
+  useEffect(() => {
+    setQuiz(quizzes.find((q: { _id: string }) => q._id === qid));
+  }, [qid, quizzes]);
 
   if (!qid) {
     throw new Error("Something went wrong.");
@@ -183,15 +190,15 @@ export default function QuizDetailsQuestionEditor() {
     }
   }
 
-  if (!quiz) {
-    return <p>Something went wrong.</p>;
+  if (!quiz || !quiz.questions) {
+    return <p>Loading quiz...</p>;
   }
 
   return (
     <div className="container my-4">
       <h1 className="mb-4">Question Editor</h1>
 
-      {quiz.questions.map((question: any, index: number) =>
+      {quiz?.questions?.map((question: any, index: number) =>
         renderQuestion(question, index)
       )}
 
@@ -203,22 +210,45 @@ export default function QuizDetailsQuestionEditor() {
 
           <Dropdown.Menu>
             <Dropdown.Item
-              onClick={() => {
-                console.log("new mc question");
+              onClick={async () => {
+                const question = {
+                  type: TYPE_MULTIPLE_CHOICE,
+                  title: "Question Title",
+                  points: 100,
+                  question: "Question Text",
+                  choices: [
+                    { id: uuidv4(), text: "Option 1", isCorrect: true },
+                  ],
+                };
+                setQuiz(await quizzesClient.createQuizQuestion(qid, question));
               }}
             >
               Multiple Choice
             </Dropdown.Item>
             <Dropdown.Item
-              onClick={() => {
-                console.log("new t/f question");
+              onClick={async () => {
+                const question = {
+                  type: TYPE_TRUE_FALSE,
+                  title: "Question Title",
+                  points: 100,
+                  question: "Question Text",
+                  correctAnswerIsTrue: true,
+                };
+                setQuiz(await quizzesClient.createQuizQuestion(qid, question));
               }}
             >
               True/False
             </Dropdown.Item>
             <Dropdown.Item
-              onClick={() => {
-                console.log("new fill in the blank question");
+              onClick={async () => {
+                const question = {
+                  type: TYPE_FILL_IN_BLANK,
+                  title: "Question Title",
+                  points: 100,
+                  question: "Question Text",
+                  possibleAnswers: [],
+                };
+                setQuiz(await quizzesClient.createQuizQuestion(qid, question));
               }}
             >
               Fill in the Blank

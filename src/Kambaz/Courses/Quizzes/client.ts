@@ -29,3 +29,8 @@ export const updateQuizQuestion = async (quizId: string, newQuestion: any) => {
   );
   return data; // Passes back the entire Quiz.
 };
+
+export const createQuizQuestion = async (quizId: string, question: any) => {
+  const { data } = await axios.post(`${QUIZZES_API}/${quizId}`, question);
+  return data; // Passes back the entire Quiz.
+};
