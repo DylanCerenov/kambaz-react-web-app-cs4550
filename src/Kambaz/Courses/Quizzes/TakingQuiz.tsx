@@ -13,7 +13,7 @@ const TakingQuiz = () => {
   const [answers, setAnswers] = useState<any>({});
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState<number | null>(null);
- 
+
   if (!quiz) return <div>Loading quiz...</div>;
 
   const handleAnswer = (questionId: string, answer: any) => {
@@ -46,12 +46,15 @@ const TakingQuiz = () => {
     setSubmitted(true);
 
     try {
-      await axios.post(`${import.meta.env.VITE_REMOTE_SERVER}/api/quizzes/${qid}/submit`, {
-        quizId: qid,
-        answers,
-        score: total,
-        submittedAt: new Date().toISOString(),
-      });
+      await axios.post(
+        `${import.meta.env.VITE_REMOTE_SERVER}/api/quizzes/${qid}/submit`,
+        {
+          quizId: qid,
+          answers,
+          score: total,
+          submittedAt: new Date().toISOString(),
+        }
+      );
     } catch (err) {
       console.error("Error saving submission:", err);
     }
@@ -67,13 +70,14 @@ const TakingQuiz = () => {
           </p>
 
           {q.type === "multiple_choice" && (
-            <div className="space-y-2 mt-2">
+            <div className="mt-2 d-flex flex-column gap-2">
               {q.choices.map((c: any) => (
                 <label key={c.id} className="block">
                   <input
                     type="radio"
                     name={q.questionId}
                     value={c.id}
+                    className="me-2"
                     disabled={submitted}
                     checked={answers[q.questionId] === c.id}
                     onChange={() => handleAnswer(q.questionId, c.id)}
@@ -85,12 +89,13 @@ const TakingQuiz = () => {
           )}
 
           {q.type === "true_false" && (
-            <div className="space-x-4 mt-2">
+            <div className="mt-2 d-flex flex-column gap-2">
               <label>
                 <input
                   type="radio"
                   name={q.questionId}
                   value="true"
+                  className="me-2"
                   disabled={submitted}
                   checked={answers[q.questionId] === true}
                   onChange={() => handleAnswer(q.questionId, true)}
@@ -102,6 +107,7 @@ const TakingQuiz = () => {
                   type="radio"
                   name={q.questionId}
                   value="false"
+                  className="me-2"
                   disabled={submitted}
                   checked={answers[q.questionId] === false}
                   onChange={() => handleAnswer(q.questionId, false)}

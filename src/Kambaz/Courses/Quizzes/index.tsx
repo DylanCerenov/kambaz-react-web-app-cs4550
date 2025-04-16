@@ -111,7 +111,7 @@ export default function Quizzes() {
               const newQuiz = {
                 title: "New Quiz",
                 points: 0,
-                published: true,
+                published: false,
                 numberOfQuestions: 0,
                 availableDate: new Date().toISOString(),
                 untilDate: new Date().toISOString(),
