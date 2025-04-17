@@ -62,6 +62,15 @@ export default function Quizzes() {
     fetchQuizzes();
   };
 
+  const buildDateObj = (date: Date) => ({
+    year: date.getFullYear(),
+    month: date.getMonth() + 1,
+    day: date.getDate(),
+    hour: date.getHours(),
+    minute: date.getMinutes(),
+  });
+  
+
   const formatDate = (dateObj: any) => {
     if (!dateObj || typeof dateObj !== "object") return "Invalid date";
     const { year, month, day, hour, minute } = dateObj;
@@ -108,14 +117,15 @@ export default function Quizzes() {
             className="ms-auto"
             id="wd-add-quiz"
             onClick={async () => {
+              const now = new Date();
               const newQuiz = {
                 title: "New Quiz",
                 points: 0,
                 published: false,
                 questions: [],
-                availableDate: new Date().toISOString(),
-                untilDate: new Date().toISOString(),
-                dueDate: new Date().toISOString(),
+                availableDate: buildDateObj(now),
+                untilDate: buildDateObj(now),
+                dueDate: buildDateObj(now),
                 quizType: "Graded Quiz",
                 assignmentGroup: "Quizzes",
                 shuffleAnswers: true,
@@ -126,7 +136,7 @@ export default function Quizzes() {
                 accessCode: "",
                 oneQuestionAtATime: true,
                 webcamRequired: false,
-                lockQuestionsAfterAnswering: false,
+                lockQuestionsAfterAnswering: false,              
               };
 
               const createdQuiz = await quizzesClient.createQuiz(cid!, newQuiz);
