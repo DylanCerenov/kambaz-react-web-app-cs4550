@@ -37,6 +37,21 @@ const QuizAttempts = () => {
     loadPreviousAnswers();
   }, [qid, uid]);
 
+  const checkAnswer = (question: any, answer: any) => {
+    if (question.type === "multiple_choice") {
+      return question.choices.find((c: any) => c.id === answer)?.isCorrect;
+    } else if (question.type === "true_false") {
+      return question.correctAnswerIsTrue === answer;
+    } else if (question.type === "fill_in_blank") {
+      return question.possibleAnswers?.some((ans: any) =>
+        ans.caseInsensitive
+          ? ans.text.toLowerCase() === answer?.toLowerCase()
+          : ans.text === answer
+      );
+    }
+    return false;
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-danger">{error}</div>;
   if (!quiz) return <div>Quiz not found.</div>;
@@ -45,67 +60,80 @@ const QuizAttempts = () => {
     <div className="container my-4">
       <h1 className="text-2xl font-bold mb-4">Quiz Attempt Review: {quiz.title}</h1>
 
-      {quiz.questions.map((q: any, idx: number) => (
-        <div key={q.questionId} className="mb-6 border-bottom pb-3">
-          <p className="fw-semibold">
-            {idx + 1}. {q.question}
-          </p>
+      {quiz.questions.map((q: any, idx: number) => {
+        const answer = answers[q.questionId];
+        const isCorrect = checkAnswer(q, answer);
 
-          {q.type === "multiple_choice" && (
-            <div className="mt-2 d-flex flex-column gap-2">
-              {q.choices.map((c: any) => (
-                <label key={c.id}>
+        return (
+          <div key={q.questionId} className="mb-6 border-bottom pb-3">
+            <p className="fw-semibold">
+              {idx + 1}. {q.question}
+            </p>
+
+            {q.type === "multiple_choice" && (
+              <div className="mt-2 d-flex flex-column gap-2">
+                {q.choices.map((c: any) => (
+                  <label key={c.id}>
+                    <input
+                      type="radio"
+                      disabled
+                      name={q.questionId}
+                      value={c.id}
+                      className="me-2"
+                      checked={answer === c.id}
+                    />
+                    {c.text}
+                  </label>
+                ))}
+              </div>
+            )}
+
+            {q.type === "true_false" && (
+              <div className="mt-2 d-flex flex-column gap-2">
+                <label>
                   <input
                     type="radio"
                     disabled
                     name={q.questionId}
-                    value={c.id}
+                    value="true"
                     className="me-2"
-                    checked={answers[q.questionId] === c.id}
+                    checked={answer === true}
                   />
-                  {c.text}
+                  True
                 </label>
-              ))}
-            </div>
-          )}
+                <label>
+                  <input
+                    type="radio"
+                    disabled
+                    name={q.questionId}
+                    value="false"
+                    className="me-2"
+                    checked={answer === false}
+                  />
+                  False
+                </label>
+              </div>
+            )}
 
-          {q.type === "true_false" && (
-            <div className="mt-2 d-flex flex-column gap-2">
-              <label>
-                <input
-                  type="radio"
-                  disabled
-                  name={q.questionId}
-                  value="true"
-                  className="me-2"
-                  checked={answers[q.questionId] === true}
-                />
-                True
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  disabled
-                  name={q.questionId}
-                  value="false"
-                  className="me-2"
-                  checked={answers[q.questionId] === false}
-                />
-                False
-              </label>
-            </div>
-          )}
+            {q.type === "fill_in_blank" && (
+              <input
+                type="text"
+                className="form-control mt-2"
+                disabled
+                value={answer || ""}
+              />
+            )}
 
-          {q.type === "fill_in_blank" && (
-            <input
-              type="text"
-              className="form-control mt-2"
-              disabled
-              value={answers[q.questionId] || ""}
-            />
-          )}
-        </div>
-      ))}
+            <p className="mt-2 text-sm fw-medium">
+              {isCorrect ? (
+                <span className="text-success">✅ Correct</span>
+              ) : (
+                <span className="text-danger">❌ Incorrect</span>
+              )}
+            </p>
+          </div>
+        );
+      })}
     </div>
   );
 };
