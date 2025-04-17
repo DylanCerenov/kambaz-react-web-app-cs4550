@@ -1,14 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Button } from "react-bootstrap";
 import axios from "axios";
+import * as quizzesClient from "./client";
 
 const TakingQuiz = () => {
   const { qid } = useParams();
   const { quizzes } = useSelector((state: any) => state.quizzesReducer);
   const quiz = quizzes.find((q: any) => q._id === qid);
+
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const uid = currentUser._id;
 
   const [answers, setAnswers] = useState<any>({});
   const [submitted, setSubmitted] = useState(false);
@@ -45,19 +49,7 @@ const TakingQuiz = () => {
     setScore(total);
     setSubmitted(true);
 
-    try {
-      await axios.post(
-        `${import.meta.env.VITE_REMOTE_SERVER}/api/quizzes/${qid}/submit`,
-        {
-          quizId: qid,
-          answers,
-          score: total,
-          submittedAt: new Date().toISOString(),
-        }
-      );
-    } catch (err) {
-      console.error("Error saving submission:", err);
-    }
+    quizzesClient.createGrade(qid!, uid, 1, total, answers);
   };
 
   return (

@@ -28,6 +28,26 @@ export default function Quizzes() {
   const [quizToCopy, setQuizToCopy] = useState<any>(null);
   const [courseList, setCourseList] = useState<any[]>([]);
 
+  // check to make sure this is right after client works
+  const [grades, setGrades] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchGrades = async () => {
+      if (currentUser.role !== "STUDENT") return;
+      const response = await quizzesClient.findAllGrades();
+      const userGrades = response.filter(
+        (g: any) => g.userId === currentUser._id
+      );
+      setGrades(userGrades);
+    };
+    fetchGrades();
+  }, [currentUser]);
+
+  const getScore = (quizId: string) => {
+    const grade = grades.find((g) => g.quizId === quizId);
+    return grade ? grade.score : null;
+  };
+
   const fetchQuizzes = async () => {
     if (!cid) {
       throw new Error("skibidi");
@@ -69,7 +89,6 @@ export default function Quizzes() {
     hour: date.getHours(),
     minute: date.getMinutes(),
   });
-  
 
   const formatDate = (dateObj: any) => {
     if (!dateObj || typeof dateObj !== "object") return "Invalid date";
@@ -136,7 +155,7 @@ export default function Quizzes() {
                 accessCode: "",
                 oneQuestionAtATime: true,
                 webcamRequired: false,
-                lockQuestionsAfterAnswering: false,              
+                lockQuestionsAfterAnswering: false,
               };
 
               const createdQuiz = await quizzesClient.createQuiz(cid!, newQuiz);
@@ -181,6 +200,9 @@ export default function Quizzes() {
                     {getAvailability(quiz)} | {quiz.points} pts |{" "}
                     {quiz.questions ? quiz.questions.length : 0} Questions | Due{" "}
                     {formatDate(quiz.dueDate)}
+                    {!isFaculty && getScore(quiz._id) !== null && (
+                      <> | Score: {getScore(quiz._id)}</>
+                    )}
                   </div>
                 </div>
 
