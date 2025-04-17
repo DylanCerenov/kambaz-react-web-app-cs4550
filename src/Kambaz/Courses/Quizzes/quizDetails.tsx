@@ -46,7 +46,14 @@ export default function QuizDetails() {
     const checkPreviousAttempt = async () => {
       if (qid && uid) {
         const grade = await quizzesClient.findGrade(qid, uid);
-        setHasPreviousAttempt(!!grade);
+
+        if (grade) {
+          console.log("bruh 1");
+          setHasPreviousAttempt(true);
+        } else {
+          console.log("bruh 2");
+          setHasPreviousAttempt(false);
+        }
       }
     };
 
@@ -169,19 +176,20 @@ export default function QuizDetails() {
         </tbody>
       </table>
 
-      {isStudent && hasMoreAttempts && (
+      {isStudent && (
         <div className="mt-4 text-center">
-          <button
-            className="btn btn-danger me-2"
-            onClick={() =>
-              navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/takingquiz`)
-            }
-          >
-            Take the Quiz
-          </button>
-
-          {/* {quizzesClient.findGrade()} */}
-
+          {hasMoreAttempts && (
+            <button
+              className="btn btn-danger me-2"
+              onClick={() =>
+                navigate(
+                  `/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/takingquiz`
+                )
+              }
+            >
+              Take the Quiz
+            </button>
+          )}
           {hasPreviousAttempt && (
             <button
               className="btn btn-warning"
