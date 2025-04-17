@@ -1,6 +1,7 @@
 import axios from "axios";
 const REMOTE_SERVER = import.meta.env.VITE_REMOTE_SERVER;
 const QUIZZES_API = `${REMOTE_SERVER}/api/quizzes`;
+export const GRADES_API = `${REMOTE_SERVER}/api/grades`;
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000";
 
 export const deleteQuiz = async (quizId: string) => {
@@ -41,4 +42,49 @@ export const deleteQuizQuestion = async (
 ) => {
   const { data } = await axios.delete(`${QUIZZES_API}/${quizId}/${questionId}`);
   return data; // Passes back the entire Quiz.
+};
+
+// Added for grades
+export const findAllGrades = async () => {
+  const response = await axios.get(`${GRADES_API}`);
+  return response.data;
+};
+
+export const createGrade = async (
+  quizId: string,
+  userId: string,
+  attemptsCount: number,
+  score: number,
+  answers: any
+) => {
+  const newGrade = {
+    quizId,
+    userId,
+    attemptsCount,
+    score,
+    answers,
+  };
+
+  const { data } = await axios.post(`${GRADES_API}/submit`, newGrade);
+  return data;
+};
+
+export const findGrade = async (qid: string, uid: string) => {
+  const response = await axios.get(`${GRADES_API}/${qid}/${uid}`);
+  return response.data;
+};
+
+export const updateGrade = async (
+  quizId: string,
+  userId: string,
+  attemptsCount: number,
+  score: number,
+  answers: any
+) => {
+  const gradeUpdates = { quizId, userId, attemptsCount, score, answers };
+  const response = await axios.put(
+    `${GRADES_API}/${quizId}/${userId}`,
+    gradeUpdates
+  );
+  return response;
 };

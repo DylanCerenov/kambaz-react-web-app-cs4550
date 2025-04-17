@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import * as coursesClient from "../client";
 import { useSelector } from "react-redux";
+import * as quizzesClient from "./client";
 
 export default function QuizDetails() {
   const { cid, qid } = useParams();
@@ -11,7 +12,7 @@ export default function QuizDetails() {
   const [quiz, setQuiz] = useState<any>(null);
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const isStudent = currentUser.role === "STUDENT";
-
+  const uid = currentUser._id; // or currentUser.id depending on your user object
   const formatDate = (dateObj: any) => {
     if (
       !dateObj ||
@@ -76,18 +77,45 @@ export default function QuizDetails() {
       <h3 className="fw-semibold mb-4">{quiz.title}</h3>
 
       <div className="mb-4">
-        <div><strong>Quiz Type</strong> &nbsp; {quiz.quizType}</div>
-        <div><strong>Points</strong> &nbsp; {quiz.points}</div>
-        <div><strong>Assignment Group</strong> &nbsp; {quiz.assignmentGroup}</div>
-        <div><strong>Shuffle Answers</strong> &nbsp; {quiz.shuffleAnswers}</div>
-        <div><strong>Time Limit</strong> &nbsp; {quiz.timeLimit}</div>
-        <div><strong>Multiple Attempts</strong> &nbsp; {quiz.multipleAttempts}</div>
-        <div><strong>View Responses - not in data rn</strong> &nbsp; {}</div>
-        <div><strong>Show Correct Answers</strong> &nbsp; {quiz.showCorrectAnswers}</div>
-        <div><strong>One Question at a Time</strong> &nbsp; {quiz.oneQuestionAtATime}</div>
-        <div><strong>Required to View Quiz Results - not in data rn</strong> &nbsp; {quiz["required to view quiz results"]}</div>
-        <div><strong>Webcam Required</strong> &nbsp; {quiz.webcamRequired}</div>
-        <div><strong>Lock Questions After Answering - not in data</strong> &nbsp; {quiz["lock questions after answering"]}</div>
+        <div>
+          <strong>Quiz Type</strong> &nbsp; {quiz.quizType}
+        </div>
+        <div>
+          <strong>Points</strong> &nbsp; {quiz.points}
+        </div>
+        <div>
+          <strong>Assignment Group</strong> &nbsp; {quiz.assignmentGroup}
+        </div>
+        <div>
+          <strong>Shuffle Answers</strong> &nbsp; {quiz.shuffleAnswers}
+        </div>
+        <div>
+          <strong>Time Limit</strong> &nbsp; {quiz.timeLimit}
+        </div>
+        <div>
+          <strong>Multiple Attempts</strong> &nbsp; {quiz.multipleAttempts}
+        </div>
+        <div>
+          <strong>View Responses - not in data rn</strong> &nbsp; {}
+        </div>
+        <div>
+          <strong>Show Correct Answers</strong> &nbsp; {quiz.showCorrectAnswers}
+        </div>
+        <div>
+          <strong>One Question at a Time</strong> &nbsp;{" "}
+          {quiz.oneQuestionAtATime}
+        </div>
+        <div>
+          <strong>Required to View Quiz Results - not in data rn</strong> &nbsp;{" "}
+          {quiz["required to view quiz results"]}
+        </div>
+        <div>
+          <strong>Webcam Required</strong> &nbsp; {quiz.webcamRequired}
+        </div>
+        <div>
+          <strong>Lock Questions After Answering - not in data</strong> &nbsp;{" "}
+          {quiz["lock questions after answering"]}
+        </div>
       </div>
 
       <table className="table w-auto">
@@ -112,12 +140,25 @@ export default function QuizDetails() {
       {isStudent && (
         <div className="mt-4 text-center">
           <button
-            className="btn btn-danger"
+            className="btn btn-danger me-2"
             onClick={() =>
               navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/takingquiz`)
             }
           >
             Take the Quiz
+          </button>
+
+          {/* {quizzesClient.findGrade()} */}
+
+          <button
+            className="btn btn-warning"
+            onClick={() =>
+              navigate(
+                `/Kambaz/Courses/${cid}/Quizzes/${qid}/${uid}/PreviousAttempts`
+              )
+            }
+          >
+            View Previous Attempts
           </button>
         </div>
       )}
