@@ -63,66 +63,42 @@ export default function QuizEditor() {
     dispatch(updateQuiz(quiz));
     };
 
-    const createUpdateQuiz = async () => {
-        if (!cid) return;
-
-        if (qid === "New"){
-            qid = uuidv4();
-        const newQuiz = {
-            _id: qid,
-            title: title,
-            course: cid,
-            points: points,
-            quizType: quizType,
-            assignmentGroup: assignmentGroup,
-            shuffleAnswers: shuffleAnswers,
-            timeLimit: timeLimit,
-            multipleAttempts: multipleAttempts,
-            howManyAttempts: howManyAttempts,
-            showCorrectAnswers: showCorrectAnswers,
-            accessCode: accessCode,
-            oneQuestionAtATime: oneQuestionAtATime,
-            webcamRequired: webcamRequired,
-            lockQuestionsAfterAnswering: lockQuestions,
-            dueDate: stringDateToObject(dueDate),
-            availableDate: stringDateToObject(availableDate),
-            untilDate: stringDateToObject(untilDate),
-         }; 
-
-         const quizTemp = await coursesClient.createQuizForCourse(
-            cid,
-            newQuiz
-         );
-         dispatch(addQuiz(quizTemp));
-        } else{
-            const newQuiz ={
-                _id: qid,
-                title: title,
-                course: cid,
-                points: points,
-                quizType: quizType,
-                assignmentGroup: assignmentGroup,
-                shuffleAnswers: shuffleAnswers,
-                timeLimit: timeLimit,
-                multipleAttempts: multipleAttempts,
-                howManyAttempts: howManyAttempts,
-                showCorrectAnswers: showCorrectAnswers,
-                accessCode: accessCode,
-                oneQuestionAtATime: oneQuestionAtATime,
-                webcamRequired: webcamRequired,
-                lockQuestionsAfterAnswering: lockQuestions,
-                dueDate: stringDateToObject(dueDate),
-                availableDate: stringDateToObject(availableDate),
-                untilDate: stringDateToObject(untilDate),
-
-            };
-
-            saveQuiz(newQuiz);
-        }
-
-        navigate(`/Kambaz/Courses/${cid}/Quizzes`)
-
-    }
+    const createUpdateQuiz = async (shouldPublish = false) => {
+      if (!cid) return;
+    
+      const baseQuiz = {
+        _id: qid === "New" ? uuidv4() : qid!,
+        title,
+        course: cid,
+        points,
+        quizType,
+        assignmentGroup,
+        shuffleAnswers,
+        timeLimit,
+        multipleAttempts,
+        howManyAttempts,
+        showCorrectAnswers,
+        accessCode,
+        oneQuestionAtATime,
+        webcamRequired,
+        lockQuestionsAfterAnswering: lockQuestions,
+        dueDate: stringDateToObject(dueDate),
+        availableDate: stringDateToObject(availableDate),
+        untilDate: stringDateToObject(untilDate),
+        published: shouldPublish,
+      };
+    
+      if (qid === "New") {
+        const quizTemp = await coursesClient.createQuizForCourse(cid, baseQuiz);
+        dispatch(addQuiz(quizTemp));
+      } else {
+        await quizClient.updateQuiz(baseQuiz);
+        dispatch(updateQuiz(baseQuiz));
+      }
+    
+      navigate(`/Kambaz/Courses/${cid}/Quizzes`);
+    };
+    
 // const createUpdateQuiz = async () => {
 //     if (!qid) return;
 //     //need to do an if new #sorry not doing now
@@ -307,13 +283,23 @@ export default function QuizEditor() {
       </div>
 
       <div className="mt-4">
-        <button className="btn btn-primary" onClick={createUpdateQuiz}>
-          {"Save"}
-        </button>
-        <button className="btn btn-secondary ml-2" onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes`)}>
-          Cancel
-        </button>
-      </div>
+  <button className="btn btn-primary" onClick={() => createUpdateQuiz(false)}>
+    Save
+  </button>
+  <button
+    className="btn btn-success ms-2"
+    onClick={() => createUpdateQuiz(true)}
+  >
+    Save & Publish
+  </button>
+  <button
+    className="btn btn-secondary ms-2"
+    onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes`)}
+  >
+    Cancel
+  </button>
+</div>
+
     </div>
   );
 }
