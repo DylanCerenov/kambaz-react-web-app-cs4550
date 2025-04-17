@@ -32,6 +32,7 @@ export default function QuizDetails() {
   const [hasPreviousAttempt, setHasPreviousAttempt] = useState<boolean | null>(
     null
   );
+  const [hasMoreAttempts, setHasMoreAttempts] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!cid) return;
@@ -45,13 +46,31 @@ export default function QuizDetails() {
     const checkPreviousAttempt = async () => {
       if (qid && uid) {
         const grade = await quizzesClient.findGrade(qid, uid);
-        console.log("grade: ", grade);
         setHasPreviousAttempt(!!grade);
       }
     };
 
-    checkPreviousAttempt();
+    const checkIfUserHasMoreAttempts = async () => {
+      if (qid && uid) {
+        const grade = await quizzesClient.findGrade(qid, uid);
+        if (grade) {
+          const countAttempts = grade.attemptsCount;
+          const quizAllowedAttempts = quiz.howManyAttempts;
+
+          if (countAttempts < quizAllowedAttempts) {
+            setHasMoreAttempts(true);
+          } else {
+            setHasMoreAttempts(false);
+          }
+        } else {
+          setHasMoreAttempts(true);
+        }
+      }
+    };
+
     fetchQuiz();
+    checkPreviousAttempt();
+    checkIfUserHasMoreAttempts();
   }, [cid, uid, qid, location.key]);
 
   if (!quiz) return <div>Loading...</div>;
@@ -150,7 +169,7 @@ export default function QuizDetails() {
         </tbody>
       </table>
 
-      {isStudent && (
+      {isStudent && hasMoreAttempts && (
         <div className="mt-4 text-center">
           <button
             className="btn btn-danger me-2"
