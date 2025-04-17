@@ -55,7 +55,7 @@ export default function QuizDetails() {
             Preview
           </button>
           <button
-            className="btn btn-outline-secondary"
+            className="btn btn-outline-secondary me-2"
             onClick={() =>
               navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/edit`)
             }
