@@ -29,6 +29,10 @@ export default function QuizDetails() {
     return `${year}-${pad(month)}-${pad(day)} ${pad(hour)}:${pad(minute)}`;
   };
 
+  const [hasPreviousAttempt, setHasPreviousAttempt] = useState<boolean | null>(
+    null
+  );
+
   useEffect(() => {
     if (!cid) return;
 
@@ -38,8 +42,17 @@ export default function QuizDetails() {
       setQuiz(currentQuiz);
     };
 
+    const checkPreviousAttempt = async () => {
+      if (qid && uid) {
+        const grade = await quizzesClient.findGrade(qid, uid);
+        console.log("grade: ", grade);
+        setHasPreviousAttempt(!!grade);
+      }
+    };
+
+    checkPreviousAttempt();
     fetchQuiz();
-  }, [cid, qid, location.key]);
+  }, [cid, uid, qid, location.key]);
 
   if (!quiz) return <div>Loading...</div>;
 
@@ -150,16 +163,18 @@ export default function QuizDetails() {
 
           {/* {quizzesClient.findGrade()} */}
 
-          <button
-            className="btn btn-warning"
-            onClick={() =>
-              navigate(
-                `/Kambaz/Courses/${cid}/Quizzes/${qid}/${uid}/PreviousAttempts`
-              )
-            }
-          >
-            View Previous Attempts
-          </button>
+          {hasPreviousAttempt && (
+            <button
+              className="btn btn-warning"
+              onClick={() =>
+                navigate(
+                  `/Kambaz/Courses/${cid}/Quizzes/${qid}/${uid}/PreviousAttempts`
+                )
+              }
+            >
+              View Previous Attempts
+            </button>
+          )}
         </div>
       )}
     </div>
