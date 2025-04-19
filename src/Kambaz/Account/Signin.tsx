@@ -46,6 +46,33 @@ export default function Signin() {
         {" "}
         Sign up{" "}
       </Link>
+
+      <br />
+      <br />
+      <br />
+
+      <p>CS 4500 - Final Project</p>
+      <ul>
+        <li>Dylan Cerenov</li>
+        <li>Avery Leiss</li>
+        <li>Declan Lowney</li>
+        <li>Elizabeth McDowell</li>
+        <li>Ella Zaugg-James</li>
+      </ul>
+
+      <Link
+        id="backend-link"
+        to="https://github.com/Declan211/cs4550-project-frontend"
+      >
+        Frontend Github Repo
+      </Link>
+      <br />
+      <Link
+        id="backend-link"
+        to="https://github.com/Declan211/cs4550-project-backend"
+      >
+        Backend Github Repo
+      </Link>
     </div>
   );
 }
