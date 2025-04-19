@@ -33,34 +33,32 @@ export default function QuizEditor() {
 
   const [title, setTitle] = useState(quiz?.title || "");
   const [points, setPoints] = useState(quiz?.points || 0);
-  const [quizType, setQuizType] = useState(
-    quiz?.["quiz type"] || "Graded Quiz"
-  );
+  const [quizType, setQuizType] = useState(quiz?.quizType || "Graded Quiz");
   const [assignmentGroup, setAssignmentGroup] = useState(
-    quiz?.["assignment group"] || "Quizzes"
+    quiz?.assignmentGroup || "Quizzes"
   );
   const [shuffleAnswers, setShuffleAnswers] = useState(
-    quiz?.["shuffle answers"] || "No"
+    quiz?.shuffleAnswers || "Yes"
   );
-  const [timeLimit, setTimeLimit] = useState(quiz?.["time limit"] || "");
+  const [timeLimit, setTimeLimit] = useState(quiz?.timeLimit || 20);
   const [multipleAttempts, setMultipleAttempts] = useState(
-    quiz?.["multiple attempts"] || "No"
+    quiz?.multipleAttempts || "No"
   );
   const [howManyAttempts, setHowManyAttempts] = useState(
-    quiz?.["how many attempts"] || ""
+    quiz?.howManyAttempts || ""
   );
   const [showCorrectAnswers, setShowCorrectAnswers] = useState(
-    quiz?.["show correct answers"] || "No"
+    quiz?.showCorrectAnswers || "No"
   );
-  const [accessCode, setAccessCode] = useState(quiz?.["access code"] || "");
+  const [accessCode, setAccessCode] = useState(quiz?.accessCode || "");
   const [oneQuestionAtATime, setOneQuestionAtATime] = useState(
-    quiz?.["one question at a time"] || "No"
+    quiz?.oneQuestionAtATime || "No"
   );
   const [webcamRequired, setWebcamRequired] = useState(
-    quiz?.["webcam required"] || "No"
+    quiz?.webcamRequired || "No"
   );
   const [lockQuestions, setLockQuestions] = useState(
-    quiz?.["lock questions after answering"] || "No"
+    quiz?.lockQuestionsAfterAnswering || "No"
   );
 
   const [dueDate, setDueDate] = useState(

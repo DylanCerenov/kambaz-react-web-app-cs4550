@@ -142,7 +142,7 @@ export default function Assignments() {
               .map((assignment: any) => (
                 <Link
                   key={assignment._id}
-                  to={assignment._id}
+                  to={isFaculty ? assignment._id : ""}
                   className="text-decoration-none"
                 >
                   <ListGroup.Item className="wd-lesson p-3 ps-1 d-flex align-items-center">
@@ -161,15 +161,17 @@ export default function Assignments() {
                       </div>
                     </div>
 
-                    <FaTrash
-                      className="text-danger me-2 mb-1"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        setAid(assignment._id);
-                        handleShow();
-                      }}
-                    />
+                    {isFaculty && (
+                      <FaTrash
+                        className="text-danger me-2 mb-1"
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          setAid(assignment._id);
+                          handleShow();
+                        }}
+                      />
+                    )}
 
                     <LessonControlButtons />
                   </ListGroup.Item>
