@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FormGroup, FormLabel, FormControl, Button } from "react-bootstrap";
-import { useSelector, useDispatch } from "react-redux";
-import { useParams, Form, Link } from "react-router";
+import { useDispatch } from "react-redux";
+import { useParams, Link } from "react-router";
 import { updateQuiz } from "../reducer";
 import * as quizzesClient from "../client";
 import { v4 as uuidv4 } from "uuid";

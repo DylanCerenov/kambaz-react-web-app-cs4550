@@ -7,137 +7,117 @@ import { v4 as uuidv4 } from "uuid";
 import * as quizClient from "./client";
 import * as coursesClient from "../client";
 function formatDate(year: number, month: number, day: number) {
-    const monthStr = String(month).padStart(2, "0");
-    const dayStr = String(day).padStart(2, "0");
-    return `${year}-${monthStr}-${dayStr}`;
-  }
-  function stringDateToObject(inputDate: string) {
-    const [year, month, day] = inputDate.split("-").map(Number);
-  
-    return {
-      year: year,
-      month: month,
-      day: day,
-      hour: 0,
-      minute: 0,
-    };
-  }
+  const monthStr = String(month).padStart(2, "0");
+  const dayStr = String(day).padStart(2, "0");
+  return `${year}-${monthStr}-${dayStr}`;
+}
+function stringDateToObject(inputDate: string) {
+  const [year, month, day] = inputDate.split("-").map(Number);
 
-
+  return {
+    year: year,
+    month: month,
+    day: day,
+    hour: 0,
+    minute: 0,
+  };
+}
 
 export default function QuizEditor() {
   let { cid, qid } = useParams();
-  const {quizzes} = useSelector((state: any) => state.quizzesReducer);
-  const quiz = quizzes.find((q: {_id: string}) => q._id === qid);
+  const { quizzes } = useSelector((state: any) => state.quizzesReducer);
+  const quiz = quizzes.find((q: { _id: string }) => q._id === qid);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [title, setTitle] = useState(quiz?.title || "");
   const [points, setPoints] = useState(quiz?.points || 0);
-  const [quizType, setQuizType] = useState(quiz?.["quiz type"] || "Graded Quiz");
-  const [assignmentGroup, setAssignmentGroup] = useState(quiz?.["assignment group"] || "Quizzes");
-  const [shuffleAnswers, setShuffleAnswers] = useState(quiz?.["shuffle answers"] || "No");
+  const [quizType, setQuizType] = useState(
+    quiz?.["quiz type"] || "Graded Quiz"
+  );
+  const [assignmentGroup, setAssignmentGroup] = useState(
+    quiz?.["assignment group"] || "Quizzes"
+  );
+  const [shuffleAnswers, setShuffleAnswers] = useState(
+    quiz?.["shuffle answers"] || "No"
+  );
   const [timeLimit, setTimeLimit] = useState(quiz?.["time limit"] || "");
-  const [multipleAttempts, setMultipleAttempts] = useState(quiz?.["multiple attempts"] || "No");
-  const [howManyAttempts, setHowManyAttempts] = useState(quiz?.["how many attempts"] || "");
-  const [showCorrectAnswers, setShowCorrectAnswers] = useState(quiz?.["show correct answers"] || "No");
+  const [multipleAttempts, setMultipleAttempts] = useState(
+    quiz?.["multiple attempts"] || "No"
+  );
+  const [howManyAttempts, setHowManyAttempts] = useState(
+    quiz?.["how many attempts"] || ""
+  );
+  const [showCorrectAnswers, setShowCorrectAnswers] = useState(
+    quiz?.["show correct answers"] || "No"
+  );
   const [accessCode, setAccessCode] = useState(quiz?.["access code"] || "");
-  const [oneQuestionAtATime, setOneQuestionAtATime] = useState(quiz?.["one question at a time"] || "No");
-  const [webcamRequired, setWebcamRequired] = useState(quiz?.["webcam required"] || "No");
-  const [lockQuestions, setLockQuestions] = useState(quiz?.["lock questions after answering"] || "No");
+  const [oneQuestionAtATime, setOneQuestionAtATime] = useState(
+    quiz?.["one question at a time"] || "No"
+  );
+  const [webcamRequired, setWebcamRequired] = useState(
+    quiz?.["webcam required"] || "No"
+  );
+  const [lockQuestions, setLockQuestions] = useState(
+    quiz?.["lock questions after answering"] || "No"
+  );
 
   const [dueDate, setDueDate] = useState(
-    quiz ? formatDate(quiz.dueDate.year, quiz.dueDate.month, quiz.dueDate.day) : "2024-05-13"
+    quiz
+      ? formatDate(quiz.dueDate.year, quiz.dueDate.month, quiz.dueDate.day)
+      : "2024-05-13"
   );
   const [availableDate, setAvailableDate] = useState(
-    quiz ? formatDate(quiz.availableDate.year, quiz.availableDate.month, quiz.availableDate.day) : "2024-05-06"
+    quiz
+      ? formatDate(
+          quiz.availableDate.year,
+          quiz.availableDate.month,
+          quiz.availableDate.day
+        )
+      : "2024-05-06"
   );
   const [untilDate, setUntilDate] = useState(
-    quiz ? formatDate(quiz.dueDate.year, quiz.dueDate.month, quiz.dueDate.day) : "2024-05-13"
+    quiz
+      ? formatDate(quiz.dueDate.year, quiz.dueDate.month, quiz.dueDate.day)
+      : "2024-05-13"
   );
 
-  const saveQuiz = async (quiz: any) => {
-    console.log("Quiz sasving",quiz);
-    await quizClient.updateQuiz(quiz);
-    dispatch(updateQuiz(quiz));
+  const createUpdateQuiz = async (shouldPublish = false) => {
+    if (!cid) return;
+
+    const baseQuiz = {
+      _id: qid === "New" ? uuidv4() : qid!,
+      title,
+      course: cid,
+      points,
+      quizType,
+      assignmentGroup,
+      shuffleAnswers,
+      timeLimit,
+      multipleAttempts,
+      howManyAttempts,
+      showCorrectAnswers,
+      accessCode,
+      oneQuestionAtATime,
+      webcamRequired,
+      lockQuestionsAfterAnswering: lockQuestions,
+      dueDate: stringDateToObject(dueDate),
+      availableDate: stringDateToObject(availableDate),
+      untilDate: stringDateToObject(untilDate),
+      published: shouldPublish,
     };
 
-    const createUpdateQuiz = async (shouldPublish = false) => {
-      if (!cid) return;
-    
-      const baseQuiz = {
-        _id: qid === "New" ? uuidv4() : qid!,
-        title,
-        course: cid,
-        points,
-        quizType,
-        assignmentGroup,
-        shuffleAnswers,
-        timeLimit,
-        multipleAttempts,
-        howManyAttempts,
-        showCorrectAnswers,
-        accessCode,
-        oneQuestionAtATime,
-        webcamRequired,
-        lockQuestionsAfterAnswering: lockQuestions,
-        dueDate: stringDateToObject(dueDate),
-        availableDate: stringDateToObject(availableDate),
-        untilDate: stringDateToObject(untilDate),
-        published: shouldPublish,
-      };
-    
-      if (qid === "New") {
-        const quizTemp = await coursesClient.createQuizForCourse(cid, baseQuiz);
-        dispatch(addQuiz(quizTemp));
-      } else {
-        await quizClient.updateQuiz(baseQuiz);
-        dispatch(updateQuiz(baseQuiz));
-      }
-    
-      navigate(`/Kambaz/Courses/${cid}/Quizzes`);
-    };
-    
-// const createUpdateQuiz = async () => {
-//     if (!qid) return;
-//     //need to do an if new #sorry not doing now
+    if (qid === "New") {
+      const quizTemp = await coursesClient.createQuizForCourse(cid, baseQuiz);
+      dispatch(addQuiz(quizTemp));
+    } else {
+      await quizClient.updateQuiz(baseQuiz);
+      dispatch(updateQuiz(baseQuiz));
+    }
 
-//     const quiz = await quizClient.createQuizForCourse(
-//         qid, 
-//     )
-
-//     const quizObj = {
-//       _id: editing ? quiz._id : uuidv4(),
-//       title,
-//       course: cid,
-//       points,
-//       quizType,
-//       assignmentGroup,
-//       shuffleAnswers,
-//       timeLimit,
-//       multipleAttempts,
-//       howManyAttempts,
-//       showCorrectAnswers,
-//       accessCode,
-//       oneQuestionAtATime,
-//       webcamRequired,
-//       lockQuestionsAfterAnswering: lockQuestions,
-//       dueDate: stringDateToObject(dueDate),
-//       availableDate: stringDateToObject(availableDate),
-//       untilDate: stringDateToObject(untilDate),
-//     };
-  
-//     console.log("This is the edited title calling title", title);
-//     console.log("This is the edited title calling calling obj", quizObj.title);
-//     console.log("Quiz is,", quizObj);
-//     dispatch(updateQuiz(quizObj));
- 
-
-    
-//     navigate(`/Kambaz/Courses/${cid}/Quizzes`);
-//   };
-  
+    navigate(`/Kambaz/Courses/${cid}/Quizzes`);
+  };
 
   return (
     <div className="container mt-4">
@@ -145,7 +125,11 @@ export default function QuizEditor() {
 
       <div className="form-group mt-2">
         <label>Title</label>
-        <input className="form-control" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <input
+          className="form-control"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
       </div>
       <div className="form-group mt-2">
         <label>Points</label>
@@ -159,7 +143,11 @@ export default function QuizEditor() {
 
       <div className="form-group mt-2">
         <label>Quiz Type</label>
-        <select className="form-control" value={quizType} onChange={(e) => setQuizType(e.target.value)}>
+        <select
+          className="form-control"
+          value={quizType}
+          onChange={(e) => setQuizType(e.target.value)}
+        >
           <option>Graded Quiz</option>
           <option>Practice Quiz</option>
           <option>Graded Survey</option>
@@ -169,7 +157,11 @@ export default function QuizEditor() {
 
       <div className="form-group mt-2">
         <label>Assignment Group</label>
-        <select className="form-control" value={assignmentGroup} onChange={(e) => setAssignmentGroup(e.target.value)}>
+        <select
+          className="form-control"
+          value={assignmentGroup}
+          onChange={(e) => setAssignmentGroup(e.target.value)}
+        >
           <option>Quizzes</option>
           <option>Exams</option>
           <option>Assignments</option>
@@ -179,7 +171,11 @@ export default function QuizEditor() {
 
       <div className="form-group mt-2">
         <label>Shuffle Answers</label>
-        <select className="form-control" value={shuffleAnswers} onChange={(e) => setShuffleAnswers(e.target.value)}>
+        <select
+          className="form-control"
+          value={shuffleAnswers}
+          onChange={(e) => setShuffleAnswers(e.target.value)}
+        >
           <option>Yes</option>
           <option>No</option>
         </select>
@@ -197,7 +193,11 @@ export default function QuizEditor() {
 
       <div className="form-group mt-2">
         <label>Multiple Attempts</label>
-        <select className="form-control" value={multipleAttempts} onChange={(e) => setMultipleAttempts(e.target.value)}>
+        <select
+          className="form-control"
+          value={multipleAttempts}
+          onChange={(e) => setMultipleAttempts(e.target.value)}
+        >
           <option>Yes</option>
           <option>No</option>
         </select>
@@ -217,7 +217,11 @@ export default function QuizEditor() {
 
       <div className="form-group mt-2">
         <label>Show Correct Answers</label>
-        <select className="form-control" value={showCorrectAnswers} onChange={(e) => setShowCorrectAnswers(e.target.value)}>
+        <select
+          className="form-control"
+          value={showCorrectAnswers}
+          onChange={(e) => setShowCorrectAnswers(e.target.value)}
+        >
           <option>Yes</option>
           <option>No</option>
         </select>
@@ -225,12 +229,20 @@ export default function QuizEditor() {
 
       <div className="form-group mt-2">
         <label>Access Code</label>
-        <input className="form-control" value={accessCode} onChange={(e) => setAccessCode(e.target.value)} />
+        <input
+          className="form-control"
+          value={accessCode}
+          onChange={(e) => setAccessCode(e.target.value)}
+        />
       </div>
 
       <div className="form-group mt-2">
         <label>One Question at a Time</label>
-        <select className="form-control" value={oneQuestionAtATime} onChange={(e) => setOneQuestionAtATime(e.target.value)}>
+        <select
+          className="form-control"
+          value={oneQuestionAtATime}
+          onChange={(e) => setOneQuestionAtATime(e.target.value)}
+        >
           <option>Yes</option>
           <option>No</option>
         </select>
@@ -238,7 +250,11 @@ export default function QuizEditor() {
 
       <div className="form-group mt-2">
         <label>Webcam Required</label>
-        <select className="form-control" value={webcamRequired} onChange={(e) => setWebcamRequired(e.target.value)}>
+        <select
+          className="form-control"
+          value={webcamRequired}
+          onChange={(e) => setWebcamRequired(e.target.value)}
+        >
           <option>Yes</option>
           <option>No</option>
         </select>
@@ -246,7 +262,11 @@ export default function QuizEditor() {
 
       <div className="form-group mt-2">
         <label>Lock Questions After Answering</label>
-        <select className="form-control" value={lockQuestions} onChange={(e) => setLockQuestions(e.target.value)}>
+        <select
+          className="form-control"
+          value={lockQuestions}
+          onChange={(e) => setLockQuestions(e.target.value)}
+        >
           <option>Yes</option>
           <option>No</option>
         </select>
@@ -283,23 +303,25 @@ export default function QuizEditor() {
       </div>
 
       <div className="mt-4">
-  <button className="btn btn-primary" onClick={() => createUpdateQuiz(false)}>
-    Save
-  </button>
-  <button
-    className="btn btn-success ms-2"
-    onClick={() => createUpdateQuiz(true)}
-  >
-    Save & Publish
-  </button>
-  <button
-    className="btn btn-secondary ms-2"
-    onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes`)}
-  >
-    Cancel
-  </button>
-</div>
-
+        <button
+          className="btn btn-primary"
+          onClick={() => createUpdateQuiz(false)}
+        >
+          Save
+        </button>
+        <button
+          className="btn btn-success ms-2"
+          onClick={() => createUpdateQuiz(true)}
+        >
+          Save & Publish
+        </button>
+        <button
+          className="btn btn-secondary ms-2"
+          onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes`)}
+        >
+          Cancel
+        </button>
+      </div>
     </div>
   );
 }

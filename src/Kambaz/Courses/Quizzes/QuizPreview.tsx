@@ -13,7 +13,7 @@ const QuizPreviewScreen = () => {
   const { quizzes } = useSelector((state: any) => state.quizzesReducer);
   const quiz = quizzes.find((q: { _id: string }) => q._id === qid);
 
-  const [answers, setAnswers] = useState({});
+  const [answers, setAnswers] = useState<Record<string, any>>({});
   const [submitted, setSubmitted] = useState(false);
 
   if (!quiz) return <div>Loading quiz...</div>;

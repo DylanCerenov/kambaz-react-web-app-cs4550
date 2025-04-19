@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Button } from "react-bootstrap";
-import axios from "axios";
 import * as quizzesClient from "./client";
 
 const TakingQuiz = () => {
