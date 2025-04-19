@@ -20,13 +20,6 @@ export default function QuestionEditors() {
 
     return (
       <div>
-        <h2>This top part is the question data for dev purposes</h2>
-        <h3>Editing {questionType} Question</h3>
-        <pre>{JSON.stringify(questionData, null, 2)}</pre>
-        <br />
-        <hr />
-        <h2>This bottom part is the actual MultipleChoiceQuestionEditor</h2>
-        <br />
         <MultipleChoiceQuestionEditor
           titleParameter={titleParameter}
           questionTextParameter={questionTextParameter}
@@ -45,13 +38,6 @@ export default function QuestionEditors() {
 
     return (
       <div>
-        <h2>This top part is the question data for dev purposes</h2>
-        <h3>Editing {questionType} Question</h3>
-        <pre>{JSON.stringify(questionData, null, 2)}</pre>
-        <br />
-        <hr />
-        <h2>This bottom part is the actual TrueFalseQuestionEditor</h2>
-        <br />
         <TrueFalseQuestionEditor
           titleParameter={titleParameter}
           pointsParameter={pointsParameter}
@@ -70,13 +56,6 @@ export default function QuestionEditors() {
 
     return (
       <div>
-        <h2>This top part is the question data for dev purposes</h2>
-        <h3>Editing {questionType} Question</h3>
-        <pre>{JSON.stringify(questionData, null, 2)}</pre>
-        <br />
-        <hr />
-        <h2>This bottom part is the actual FillInBlankQuestionEditor</h2>
-        <br />
         <FillInBlankQuestionEditor
           titleParameter={titleParameter}
           questionTextParameter={questionTextParameter}
