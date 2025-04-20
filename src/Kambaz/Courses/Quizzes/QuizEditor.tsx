@@ -34,7 +34,7 @@ export default function QuizEditor() {
 
   const [title, setTitle] = useState(quiz?.title || "");
   const [desc, setDesc] = useState(quiz?.desc || "");
-  const [points, setPoints] = useState(quiz?.points || 0);
+  const [points] = useState(quiz?.points || 0);
   const [quizType, setQuizType] = useState(quiz?.quizType || "Graded Quiz");
   const [assignmentGroup, setAssignmentGroup] = useState(
     quiz?.assignmentGroup || "Quizzes"
@@ -149,12 +149,7 @@ export default function QuizEditor() {
 
       <div className="form-group mt-2">
         <label>Points</label>
-        <input
-          type="number"
-          className="form-control"
-          value={points}
-          onChange={(e) => setPoints(Number(e.target.value))}
-        />
+        <p>{points}</p>
       </div>
 
       <div className="form-group mt-2">
