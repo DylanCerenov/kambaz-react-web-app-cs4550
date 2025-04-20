@@ -6,6 +6,7 @@ import { addQuiz, updateQuiz } from "./reducer"; //addQuiz
 import { v4 as uuidv4 } from "uuid";
 import * as quizClient from "./client";
 import * as coursesClient from "../client";
+import { FormControl } from "react-bootstrap";
 function formatDate(year: number, month: number, day: number) {
   const monthStr = String(month).padStart(2, "0");
   const dayStr = String(day).padStart(2, "0");
@@ -32,6 +33,7 @@ export default function QuizEditor() {
   const navigate = useNavigate();
 
   const [title, setTitle] = useState(quiz?.title || "");
+  const [desc, setDesc] = useState(quiz?.desc || "");
   const [points, setPoints] = useState(quiz?.points || 0);
   const [quizType, setQuizType] = useState(quiz?.quizType || "Graded Quiz");
   const [assignmentGroup, setAssignmentGroup] = useState(
@@ -49,6 +51,11 @@ export default function QuizEditor() {
   );
   const [showCorrectAnswers, setShowCorrectAnswers] = useState(
     quiz?.showCorrectAnswers || "No"
+  );
+  const [showCorrectAnswersAfter, setShowCorrectAnswersAfter] = useState(
+    quiz
+      ? formatDate(quiz.dueDate.year, quiz.dueDate.month, quiz.dueDate.day)
+      : ""
   );
   const [accessCode, setAccessCode] = useState(quiz?.accessCode || "");
   const [oneQuestionAtATime, setOneQuestionAtATime] = useState(
@@ -87,6 +94,7 @@ export default function QuizEditor() {
     const baseQuiz = {
       _id: qid === "New" ? uuidv4() : qid!,
       title,
+      desc,
       course: cid,
       points,
       quizType,
@@ -113,8 +121,6 @@ export default function QuizEditor() {
       await quizClient.updateQuiz(baseQuiz);
       dispatch(updateQuiz(baseQuiz));
     }
-
-    navigate(`/Kambaz/Courses/${cid}/Quizzes`);
   };
 
   return (
@@ -129,6 +135,18 @@ export default function QuizEditor() {
           onChange={(e) => setTitle(e.target.value)}
         />
       </div>
+
+      <div className="form-group mt-2">
+        <label>Description</label>
+        <FormControl
+          as="textarea"
+          rows={3}
+          placeholder="Description..."
+          defaultValue={desc}
+          onChange={(e) => setDesc(e.target.value)}
+        />
+      </div>
+
       <div className="form-group mt-2">
         <label>Points</label>
         <input
@@ -225,6 +243,20 @@ export default function QuizEditor() {
         </select>
       </div>
 
+      {showCorrectAnswers === "Yes" && (
+        <div className="form-group mt-2">
+          <label>Show Correct Answers After</label>
+          <input
+            type="date"
+            className="form-control"
+            value={showCorrectAnswersAfter}
+            onChange={(e) =>
+              setShowCorrectAnswersAfter(e.target.value.toString())
+            }
+          />
+        </div>
+      )}
+
       <div className="form-group mt-2">
         <label>Access Code</label>
         <input
@@ -303,13 +335,19 @@ export default function QuizEditor() {
       <div className="mt-4">
         <button
           className="btn btn-primary"
-          onClick={() => createUpdateQuiz(false)}
+          onClick={() => {
+            createUpdateQuiz(false);
+            navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}`);
+          }}
         >
           Save
         </button>
         <button
           className="btn btn-success ms-2"
-          onClick={() => createUpdateQuiz(true)}
+          onClick={() => {
+            createUpdateQuiz(true);
+            navigate(`/Kambaz/Courses/${cid}/Quizzes`);
+          }}
         >
           Save & Publish
         </button>
