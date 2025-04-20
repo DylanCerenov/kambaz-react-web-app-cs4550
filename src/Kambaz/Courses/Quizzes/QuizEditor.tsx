@@ -6,6 +6,7 @@ import { addQuiz, updateQuiz } from "./reducer"; //addQuiz
 import { v4 as uuidv4 } from "uuid";
 import * as quizClient from "./client";
 import * as coursesClient from "../client";
+import { FormControl } from "react-bootstrap";
 function formatDate(year: number, month: number, day: number) {
   const monthStr = String(month).padStart(2, "0");
   const dayStr = String(day).padStart(2, "0");
@@ -32,35 +33,39 @@ export default function QuizEditor() {
   const navigate = useNavigate();
 
   const [title, setTitle] = useState(quiz?.title || "");
-  const [points, setPoints] = useState(quiz?.points || 0);
-  const [quizType, setQuizType] = useState(
-    quiz?.["quiz type"] || "Graded Quiz"
-  );
+  const [desc, setDesc] = useState(quiz?.desc || "");
+  const [points] = useState(quiz?.points || 0);
+  const [quizType, setQuizType] = useState(quiz?.quizType || "Graded Quiz");
   const [assignmentGroup, setAssignmentGroup] = useState(
-    quiz?.["assignment group"] || "Quizzes"
+    quiz?.assignmentGroup || "Quizzes"
   );
   const [shuffleAnswers, setShuffleAnswers] = useState(
-    quiz?.["shuffle answers"] || "No"
+    quiz?.shuffleAnswers || "Yes"
   );
-  const [timeLimit, setTimeLimit] = useState(quiz?.["time limit"] || "");
+  const [timeLimit, setTimeLimit] = useState(quiz?.timeLimit || 20);
   const [multipleAttempts, setMultipleAttempts] = useState(
-    quiz?.["multiple attempts"] || "No"
+    quiz?.multipleAttempts || "No"
   );
   const [howManyAttempts, setHowManyAttempts] = useState(
-    quiz?.["how many attempts"] || ""
+    quiz?.howManyAttempts || ""
   );
   const [showCorrectAnswers, setShowCorrectAnswers] = useState(
-    quiz?.["show correct answers"] || "No"
+    quiz?.showCorrectAnswers || "No"
   );
-  const [accessCode, setAccessCode] = useState(quiz?.["access code"] || "");
+  const [showCorrectAnswersAfter, setShowCorrectAnswersAfter] = useState(
+    quiz
+      ? formatDate(quiz.dueDate.year, quiz.dueDate.month, quiz.dueDate.day)
+      : ""
+  );
+  const [accessCode, setAccessCode] = useState(quiz?.accessCode || "");
   const [oneQuestionAtATime, setOneQuestionAtATime] = useState(
-    quiz?.["one question at a time"] || "No"
+    quiz?.oneQuestionAtATime || "No"
   );
   const [webcamRequired, setWebcamRequired] = useState(
-    quiz?.["webcam required"] || "No"
+    quiz?.webcamRequired || "No"
   );
   const [lockQuestions, setLockQuestions] = useState(
-    quiz?.["lock questions after answering"] || "No"
+    quiz?.lockQuestionsAfterAnswering || "No"
   );
 
   const [dueDate, setDueDate] = useState(
@@ -89,6 +94,7 @@ export default function QuizEditor() {
     const baseQuiz = {
       _id: qid === "New" ? uuidv4() : qid!,
       title,
+      desc,
       course: cid,
       points,
       quizType,
@@ -115,8 +121,6 @@ export default function QuizEditor() {
       await quizClient.updateQuiz(baseQuiz);
       dispatch(updateQuiz(baseQuiz));
     }
-
-    navigate(`/Kambaz/Courses/${cid}/Quizzes`);
   };
 
   return (
@@ -131,14 +135,21 @@ export default function QuizEditor() {
           onChange={(e) => setTitle(e.target.value)}
         />
       </div>
+
+      <div className="form-group mt-2">
+        <label>Description</label>
+        <FormControl
+          as="textarea"
+          rows={3}
+          placeholder="Description..."
+          defaultValue={desc}
+          onChange={(e) => setDesc(e.target.value)}
+        />
+      </div>
+
       <div className="form-group mt-2">
         <label>Points</label>
-        <input
-          type="number"
-          className="form-control"
-          value={points}
-          onChange={(e) => setPoints(Number(e.target.value))}
-        />
+        <p>{points}</p>
       </div>
 
       <div className="form-group mt-2">
@@ -227,6 +238,20 @@ export default function QuizEditor() {
         </select>
       </div>
 
+      {showCorrectAnswers === "Yes" && (
+        <div className="form-group mt-2">
+          <label>Show Correct Answers After</label>
+          <input
+            type="date"
+            className="form-control"
+            value={showCorrectAnswersAfter}
+            onChange={(e) =>
+              setShowCorrectAnswersAfter(e.target.value.toString())
+            }
+          />
+        </div>
+      )}
+
       <div className="form-group mt-2">
         <label>Access Code</label>
         <input
@@ -305,13 +330,19 @@ export default function QuizEditor() {
       <div className="mt-4">
         <button
           className="btn btn-primary"
-          onClick={() => createUpdateQuiz(false)}
+          onClick={() => {
+            createUpdateQuiz(false);
+            navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}`);
+          }}
         >
           Save
         </button>
         <button
           className="btn btn-success ms-2"
-          onClick={() => createUpdateQuiz(true)}
+          onClick={() => {
+            createUpdateQuiz(true);
+            navigate(`/Kambaz/Courses/${cid}/Quizzes`);
+          }}
         >
           Save & Publish
         </button>

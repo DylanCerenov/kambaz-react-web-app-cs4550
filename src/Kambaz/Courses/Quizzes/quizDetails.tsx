@@ -48,10 +48,8 @@ export default function QuizDetails() {
         const grade = await quizzesClient.findGrade(qid, uid);
 
         if (grade) {
-          console.log("bruh 1");
           setHasPreviousAttempt(true);
         } else {
-          console.log("bruh 2");
           setHasPreviousAttempt(false);
         }
       }
@@ -60,9 +58,13 @@ export default function QuizDetails() {
     const checkIfUserHasMoreAttempts = async () => {
       if (qid && uid) {
         const grade = await quizzesClient.findGrade(qid, uid);
+        const quizzes = await coursesClient.findQuizzesForCourse(cid);
+        const currentQuiz = quizzes.find((q: any) => q._id === qid);
+        setQuiz(currentQuiz);
+
         if (grade) {
           const countAttempts = grade.attemptsCount;
-          const quizAllowedAttempts = quiz.howManyAttempts;
+          const quizAllowedAttempts = currentQuiz.howManyAttempts;
 
           if (countAttempts < quizAllowedAttempts) {
             setHasMoreAttempts(true);
@@ -120,9 +122,6 @@ export default function QuizDetails() {
           <strong>Quiz Type</strong> &nbsp; {quiz.quizType}
         </div>
         <div>
-          <strong>Points</strong> &nbsp; {quiz.points}
-        </div>
-        <div>
           <strong>Assignment Group</strong> &nbsp; {quiz.assignmentGroup}
         </div>
         <div>
@@ -132,28 +131,32 @@ export default function QuizDetails() {
           <strong>Time Limit</strong> &nbsp; {quiz.timeLimit}
         </div>
         <div>
-          <strong>Multiple Attempts</strong> &nbsp; {quiz.multipleAttempts}
+          <strong>Lock Questions After Answering</strong> &nbsp;{" "}
+          {quiz.lockQuestionsAfterAnswering}
         </div>
-        <div>
-          <strong>View Responses - not in data rn</strong> &nbsp; {}
-        </div>
+
         <div>
           <strong>Show Correct Answers</strong> &nbsp; {quiz.showCorrectAnswers}
+        </div>
+        <div>
+          <strong>Access Code</strong> &nbsp; {quiz.accessCode}
         </div>
         <div>
           <strong>One Question at a Time</strong> &nbsp;{" "}
           {quiz.oneQuestionAtATime}
         </div>
         <div>
-          <strong>Required to View Quiz Results - not in data rn</strong> &nbsp;{" "}
-          {quiz["required to view quiz results"]}
-        </div>
-        <div>
           <strong>Webcam Required</strong> &nbsp; {quiz.webcamRequired}
         </div>
+
         <div>
-          <strong>Lock Questions After Answering - not in data</strong> &nbsp;{" "}
-          {quiz["lock questions after answering"]}
+          <strong>Multiple Attempts</strong> &nbsp; {quiz.multipleAttempts}
+        </div>
+        <div>
+          <strong>How Many Attempts</strong> &nbsp; {quiz.howManyAttempts}
+        </div>
+        <div>
+          <strong>Points</strong> &nbsp; {quiz.points}
         </div>
       </div>
 

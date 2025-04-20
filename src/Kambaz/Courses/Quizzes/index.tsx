@@ -147,15 +147,15 @@ export default function Quizzes() {
                 dueDate: buildDateObj(now),
                 quizType: "Graded Quiz",
                 assignmentGroup: "Quizzes",
-                shuffleAnswers: true,
+                shuffleAnswers: "Yes",
                 timeLimit: 20,
-                multipleAttempts: false,
+                multipleAttempts: "No",
                 howManyAttempts: 1,
                 showCorrectAnswers: "Never",
                 accessCode: "",
-                oneQuestionAtATime: true,
-                webcamRequired: false,
-                lockQuestionsAfterAnswering: false,
+                oneQuestionAtATime: "Yes",
+                webcamRequired: "No",
+                lockQuestionsAfterAnswering: "No",
               };
 
               const createdQuiz = await quizzesClient.createQuiz(cid!, newQuiz);
