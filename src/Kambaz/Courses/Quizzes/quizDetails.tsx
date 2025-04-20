@@ -63,20 +63,12 @@ export default function QuizDetails() {
         setQuiz(currentQuiz);
 
         if (grade) {
-          console.log("got here instead");
-          console.log("grade.attemptsCount: " + grade.attemptsCount);
-          console.log("quiz: " + currentQuiz);
-          console.log("quiz.howManyAttempts: " + currentQuiz.howManyAttempts);
-
           const countAttempts = grade.attemptsCount;
           const quizAllowedAttempts = currentQuiz.howManyAttempts;
 
           if (countAttempts < quizAllowedAttempts) {
             setHasMoreAttempts(true);
           } else {
-            console.log("got here");
-            console.log("countAttempts: " + countAttempts);
-            console.log("quizAllowedAttempts: " + quizAllowedAttempts);
             setHasMoreAttempts(false);
           }
         } else {

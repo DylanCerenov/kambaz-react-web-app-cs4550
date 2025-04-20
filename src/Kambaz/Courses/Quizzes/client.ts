@@ -54,7 +54,8 @@ export const createGrade = async (
   userId: string,
   attemptsCount: number,
   score: number,
-  answers: any
+  answers: any,
+  submissionTime: string
 ) => {
   const newGrade = {
     quizId,
@@ -62,6 +63,7 @@ export const createGrade = async (
     attemptsCount,
     score,
     answers,
+    submissionTime,
   };
 
   const { data } = await axios.post(`${GRADES_API}/submit`, newGrade);

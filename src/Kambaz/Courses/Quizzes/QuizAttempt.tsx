@@ -9,6 +9,8 @@ const QuizAttempts = () => {
   const quiz = quizzes.find((q: any) => q._id === qid);
 
   const [answers, setAnswers] = useState<{ [key: string]: any }>({});
+  const [score, setScore] = useState(0);
+  const [submissionTime, setSubmissionTime] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,6 +28,9 @@ const QuizAttempts = () => {
         } else {
           setError("No answers found for this quiz attempt.");
         }
+
+        setScore(grade.score);
+        setSubmissionTime(grade.submissionTime);
       } catch (error) {
         console.error("Error loading previous answers:", error);
         setError("Failed to load previous answers.");
@@ -58,7 +63,14 @@ const QuizAttempts = () => {
 
   return (
     <div className="container my-4">
-      <h1 className="text-2xl font-bold mb-4">Quiz Attempt Review: {quiz.title}</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        Quiz Attempt Review: {quiz.title}
+      </h1>
+
+      <p>
+        Points: {score} / {quiz.points}
+      </p>
+      <p>Submission Time: {submissionTime}</p>
 
       {quiz.questions.map((q: any, idx: number) => {
         const answer = answers[q.questionId];

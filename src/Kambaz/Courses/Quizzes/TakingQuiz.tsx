@@ -48,7 +48,8 @@ const TakingQuiz = () => {
     setScore(total);
     setSubmitted(true);
 
-    quizzesClient.createGrade(qid!, uid, 1, total, answers);
+    const submissionTime = new Date().toISOString();
+    quizzesClient.createGrade(qid!, uid, 1, total, answers, submissionTime);
   };
 
   return (
